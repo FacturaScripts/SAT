@@ -1,8 +1,8 @@
 <?php
 /*
  * This file is part of FacturaSctipts
- * Copyright (C) 2014  Francisco Javier Trujillo   javier.trujillo.jimenez@gmail.com
- * Copyright (C) 2014  Carlos Garcia Gomez         neorazorx@gmail.com
+ * Copyright (C) 2014      Francisco Javier Trujillo   javier.trujillo.jimenez@gmail.com
+ * Copyright (C) 2014-2015 Carlos Garcia Gomez         neorazorx@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -139,7 +139,6 @@ class registro_sat extends fs_model
       return $prioridades[$this->prioridad];
    }
    
-   
    public function url()
    {
       if( is_null($this->nsat) )
@@ -155,9 +154,22 @@ class registro_sat extends fs_model
    public function cliente_url()
    {
       if( is_null($this->codcliente) )
+      {
          return "index.php?page=ventas_clientes";
+      }
       else
          return "index.php?page=ventas_cliente&cod=".$this->codcliente;
+   }
+   
+   public function direccion_cliente()
+   {
+      $data = $this->db->select("SELECT * FROM dirclientes WHERE codcliente = ".$this->var2str($this->codcliente).";");
+      if($data)
+      {
+         return $data[0]['direccion'].', '.$data[0]['ciudad'].', '.$data[0]['provincia'];
+      }
+      else
+         return '';
    }
    
    public function get($id)
@@ -169,7 +181,9 @@ class registro_sat extends fs_model
          WHERE registros_sat.codcliente = clientes.codcliente AND nsat = ".$this->var2str($id).";";
       $data = $this->db->select($sql);
       if($data)
+      {
          return new registro_sat($data[0]);
+      }
       else
          return FALSE;
    }
@@ -186,7 +200,7 @@ class registro_sat extends fs_model
       }
    }
    
-   public function test()
+   public function save()
    {
       $this->modelo = $this->no_html($this->modelo);
       $this->averia = $this->no_html($this->averia);
@@ -194,45 +208,34 @@ class registro_sat extends fs_model
       $this->observaciones = $this->no_html($this->observaciones);
       $this->posicion = $this->no_html($this->posicion);
       
-      /// realmente no quería comprobar nada, simplemente eliminar el html de las variables
-      return TRUE;
-   }
-   
-   public function save()
-   {
-      if( $this->test() )
+      if( $this->exists() )
       {
-         if( $this->exists() )
-         {
-            $sql = "UPDATE registros_sat SET prioridad = ".$this->var2str($this->prioridad).",
-               fcomienzo = ".$this->var2str($this->fcomienzo).", ffin = ".$this->var2str($this->ffin).",
-               modelo = ".$this->var2str($this->modelo).", codcliente = ".$this->var2str($this->codcliente).",
-               estado = ".$this->var2str($this->estado).", averia = ".$this->var2str($this->averia).",
-               accesorios = ".$this->var2str($this->accesorios).", observaciones = ".$this->var2str($this->observaciones).",
-               posicion = ".$this->var2str($this->posicion)." WHERE nsat = ".$this->var2str($this->nsat).";";
-            
-            return $this->db->exec($sql);
-         }
-         else
-         {
-            $sql = "INSERT INTO registros_sat (prioridad,fentrada,fcomienzo,ffin,modelo,codcliente,estado,
-               averia,accesorios,observaciones) VALUES (".$this->var2str($this->prioridad).",
-               ".$this->var2str($this->fentrada).",".$this->var2str($this->fcomienzo).",".$this->var2str($this->ffin).",
-               ".$this->var2str($this->modelo).",".$this->var2str($this->codcliente).",
-               ".$this->var2str($this->estado).",".$this->var2str($this->averia).",
-               ".$this->var2str($this->accesorios).",".$this->var2str($this->observaciones).");";
-            
-            if( $this->db->exec($sql) )
-            {
-               $this->nsat = $this->db->lastval();
-               return TRUE;
-            }
-            else
-               return FALSE;
-         }
+         $sql = "UPDATE registros_sat SET prioridad = ".$this->var2str($this->prioridad).",
+            fcomienzo = ".$this->var2str($this->fcomienzo).", ffin = ".$this->var2str($this->ffin).",
+            modelo = ".$this->var2str($this->modelo).", codcliente = ".$this->var2str($this->codcliente).",
+            estado = ".$this->var2str($this->estado).", averia = ".$this->var2str($this->averia).",
+            accesorios = ".$this->var2str($this->accesorios).", observaciones = ".$this->var2str($this->observaciones).",
+            posicion = ".$this->var2str($this->posicion)." WHERE nsat = ".$this->var2str($this->nsat).";";
+         
+         return $this->db->exec($sql);
       }
       else
-         return FALSE;
+      {
+         $sql = "INSERT INTO registros_sat (prioridad,fentrada,fcomienzo,ffin,modelo,codcliente,estado,
+            averia,accesorios,observaciones) VALUES (".$this->var2str($this->prioridad).",
+            ".$this->var2str($this->fentrada).",".$this->var2str($this->fcomienzo).",".$this->var2str($this->ffin).",
+            ".$this->var2str($this->modelo).",".$this->var2str($this->codcliente).",
+            ".$this->var2str($this->estado).",".$this->var2str($this->averia).",
+            ".$this->var2str($this->accesorios).",".$this->var2str($this->observaciones).");";
+         
+         if( $this->db->exec($sql) )
+         {
+            $this->nsat = $this->db->lastval();
+            return TRUE;
+         }
+         else
+            return FALSE;
+      }
    }
    
    public function delete()
@@ -332,8 +335,12 @@ class registro_sat extends fs_model
    
    public function num_detalles()
    {
-      $sql = "SELECT count(*) as num FROM detalles_sat WHERE nsat = ".$this->var2str($this->nsat).";";
-      $result = $this->db->select($sql);
-      return $this->num_detalles = intval($result[0]['num']);
+      $result = $this->db->select("SELECT count(*) as num FROM detalles_sat WHERE nsat = ".$this->var2str($this->nsat).";");
+      if($result)
+      {
+         return intval($result[0]['num']);
+      }
+      else
+         return 0;
    }
 }

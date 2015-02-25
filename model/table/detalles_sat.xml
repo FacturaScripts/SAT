@@ -26,6 +26,10 @@
       <tipo>date</tipo>
       <nulo>NO</nulo>
    </columna>
+   <columna>
+      <nombre>nick</nombre>
+      <tipo>character varying(12)</tipo>
+   </columna>
    <restriccion>
       <nombre>detalles_sat_pkey</nombre>
       <consulta>PRIMARY KEY (id)</consulta>

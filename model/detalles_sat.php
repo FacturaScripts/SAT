@@ -2,7 +2,7 @@
 /*
  * This file is part of FacturaSctipts
  * Copyright (C) 2014  Francisco Javier Trujillo   javier.trujillo.jimenez@gmail.com
- * Copyright (C) 2014  Carlos Garcia Gomez         neorazorx@gmail.com
+ * Copyright (C) 2014-2015  Carlos Garcia Gomez         neorazorx@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,17 +24,18 @@ class detalles_sat extends fs_model
    public $descripcion;
    public $nsat;
    public $fecha;
+   public $nick;
    
    public function __construct($s = FALSE)
    {
       parent::__construct('detalles_sat', 'plugins/SAT/');
-      
       if($s)
       {
          $this->id = intval($s['id']);
          $this->descripcion = $s['descripcion'];
          $this->nsat = intval($s['nsat']);
          $this->fecha = date('d-m-Y', strtotime($s['fecha']));
+         $this->nick = $s['nick'];
       }
       else
       {
@@ -42,6 +43,7 @@ class detalles_sat extends fs_model
          $this->descripcion = '';
          $this->nsat = NULL;
          $this->fecha = date('d-m-Y');
+         $this->nick = NULL;
       }
    }
    
@@ -50,16 +52,13 @@ class detalles_sat extends fs_model
       return '';
    }
    
-   
-   
    public function get($id)
    {
-      $sql = "SELECT id,descripcion,nsat,fecha
-         FROM detalles_sat
-         WHERE id = ".$this->var2str($id).";";
-      $data = $this->db->select($sql);
+      $data = $this->db->select("SELECT * FROM detalles_sat WHERE id = ".$this->var2str($id).";");
       if($data)
+      {
          return new detalles_sat($data[0]);
+      }
       else
          return FALSE;
    }
@@ -76,56 +75,44 @@ class detalles_sat extends fs_model
       }
    }
    
-   public function test()
+   public function save()
    {
       $this->descripcion = $this->no_html($this->descripcion);
       
-      /// realmente no quería comprobar nada, simplemente eliminar el html de las variables
-      return TRUE;
-   }
-   
-   public function save()
-   {
-      if( $this->test() )
+      if( $this->exists() )
       {
-         if( $this->exists() )
-         {
-            $sql = "UPDATE detalles_sat SET descripcion = ".$this->var2str($this->descripcion).",
-               fecha = ".$this->var2str($this->fecha).", nsat = ".$this->var2str($this->nsat).""
-               . " WHERE id = ".$this->var2str($this->id).";";
-            
-            return $this->db->exec($sql);
-         }
-         else
-         {
-            $sql = "INSERT INTO detalles_sat (descripcion,fecha,nsat) VALUES (".$this->var2str($this->descripcion).",
-               ".$this->var2str($this->fecha).",".$this->var2str($this->nsat).");";
-            
-            if( $this->db->exec($sql) )
-            {
-               $this->id = $this->db->lastval();
-               return TRUE;
-            }
-            else
-               return FALSE;
-         }
+         $sql = "UPDATE detalles_sat SET descripcion = ".$this->var2str($this->descripcion).",
+            fecha = ".$this->var2str($this->fecha).", nsat = ".$this->var2str($this->nsat).",
+            nick = ".$this->var2str($this->nick)." WHERE id = ".$this->var2str($this->id).";";
+         
+         return $this->db->exec($sql);
       }
       else
-         return FALSE;
+      {
+         $sql = "INSERT INTO detalles_sat (descripcion,fecha,nsat,nick) VALUES (".$this->var2str($this->descripcion).",
+            ".$this->var2str($this->fecha).",".$this->var2str($this->nsat).",".$this->var2str($this->nick).");";
+         
+         if( $this->db->exec($sql) )
+         {
+            $this->id = $this->db->lastval();
+            return TRUE;
+         }
+         else
+            return FALSE;
+      }
    }
    
    public function delete()
    {
-      
+      return $this->db->exec("DELETE FROM detalles_sat WHERE id = ".$this->var2str($this->nsat).";");
    }
    
    public function all()
    {
       $detalleslist = array();
       
-      $sql = "SELECT detalles_sat.id, detalles_sat.descripcion,detalles_sat.nsat, detalles_sat.fecha
-         FROM registros_sat, detalles_sat
-         WHERE detalles_sat.nsat = registros_sat.nsat ORDER BY fecha ASC, id ASC;";
+      $sql = "SELECT d.id,d.descripcion,d.nsat,d.fecha,d.nick FROM registros_sat r, detalles_sat d
+         WHERE d.nsat = r.nsat ORDER BY d.fecha ASC, d.id ASC;";
       $data = $this->db->select($sql);
       if($data)
       {
@@ -140,9 +127,8 @@ class detalles_sat extends fs_model
    {
       $detalleslist = array();
       
-      $sql = "SELECT detalles_sat.id, detalles_sat.descripcion,detalles_sat.nsat, detalles_sat.fecha
-         FROM registros_sat, detalles_sat
-         WHERE detalles_sat.nsat = registros_sat.nsat AND detalles_sat.nsat = $sat ORDER BY fecha ASC, id ASC;";
+      $sql = "SELECT d.id,d.descripcion,d.nsat,d.fecha,d.nick FROM registros_sat r, detalles_sat d
+         WHERE d.nsat = r.nsat AND d.nsat = ".$this->var2str($sat)." ORDER BY d.fecha ASC, d.id ASC;";
       $data = $this->db->select($sql);
       if($data)
       {
@@ -152,5 +138,4 @@ class detalles_sat extends fs_model
       
       return $detalleslist;
    }
-   
 }

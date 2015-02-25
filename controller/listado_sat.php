@@ -3,7 +3,7 @@
 /*
  * This file is part of FacturaSctipts
  * Copyright (C) 2014  Francisco Javier Trujillo   javier.trujillo.jimenez@gmail.com
- * Copyright (C) 2014  Carlos Garcia Gomez         neorazorx@gmail.com
+ * Copyright (C) 2014-2015  Carlos Garcia Gomez         neorazorx@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -36,27 +36,34 @@ class listado_sat extends fs_controller
    public $estado;
    public $num_detalles;
    public $pais;
+   public $maps_api_key;
 
-   public function __construct() {
-      parent::__construct(__CLASS__, 'SAT', 'ventas', FALSE, TRUE);
-      /// cualquier cosa que pongas aquí se ejecutará DESPUÉS de process()
+   public function __construct()
+   {
+      parent::__construct(__CLASS__, 'SAT', 'SAT', FALSE, TRUE);
    }
 
    /**
     * esta función se ejecuta si el usuario ha hecho login,
     * a efectos prácticos, este es el constructor
     */
-   protected function process()
+   protected function private_core()
    {
-      /// desactivamos la barra de botones
-      $this->show_fs_toolbar = FALSE;
-      
       $this->agente = FALSE;
       $this->cliente = new cliente();
       $this->registro_sat = new registro_sat();
       $this->detalles_sat = new detalles_sat();
       $this->pais = new pais();
-
+      
+      $fsvar = new fs_var();
+      if( isset($_POST['maps_api_key']) )
+      {
+         $this->maps_api_key = $_POST['maps_api_key'];
+         $fsvar->simple_save('maps_api_key', $this->maps_api_key);
+      }
+      else
+         $this->maps_api_key = $fsvar->simple_get('maps_api_key');
+      
       $this->busqueda = array(
           'contenido' => '',
           'desde' => '',
@@ -363,8 +370,9 @@ class listado_sat extends fs_controller
       $detalle = new detalles_sat();
       $detalle->descripcion = $_POST['detalle'];
       $detalle->nsat = $_GET['id'];
+      $detalle->nick = $this->user->nick;
       
-      if ($detalle->save())
+      if( $detalle->save() )
       {
          $this->new_message('Detalle guardados correctamente.');
       }
@@ -380,9 +388,14 @@ class listado_sat extends fs_controller
       $detalle = new detalles_sat();
       $detalle->descripcion = "Se a cambiado el estado a : " . $this->registro_sat->nombre_estado_param($estado);
       $detalle->nsat = $_GET['id'];
-      if ($detalle->save()) {
+      $detalle->nick = $this->user->nick;
+      
+      if( $detalle->save() )
+      {
          $this->new_message('Detalle guardados correctamente.');
-      } else {
+      }
+      else
+      {
          $this->new_error_msg('Imposible guardar el detalle.');
          return FALSE;
       }
@@ -401,6 +414,7 @@ class listado_sat extends fs_controller
                   'params' => ''
               )
       );
+      
       if( !$fsext0->save() )
       {
          $this->new_error_msg('Imposible guardar los datos de la extensión.');
