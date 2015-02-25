@@ -25,6 +25,7 @@
          $("#b_resultados").addClass('active');
          $("#b_mapa").removeClass('active');
          $("#map-canvas").hide();
+         $("#map-api-form").hide();
          $("#resultados_sat").show();
       });
       $("#b_mapa").click(function(event) {
@@ -33,6 +34,7 @@
          $("#b_mapa").addClass('active');
          $("#resultados_sat").hide();
          $("#map-canvas").show();
+         $("#map-api-form").show();
       });
    });
 </script>
@@ -208,7 +210,7 @@
 </script>
 <div id="map-canvas" style="width:100%; height:800px;"></div>
 <form action="{$fsc->url()}" method="post" class="form">
-   <div style="margin: 10px;">
+   <div id="map-api-form" style="margin: 10px; display: none;">
       <div class="form-group">
          Nueva clave de la API:
          <input type="text" name="maps_api_key" placeholder="Clave de la API" class="form-control" autocomplete="off"/>
@@ -220,7 +222,7 @@
 </form>
 {else}
 <form action="{$fsc->url()}" method="post" class="form">
-   <div class="container-fluid" style="margin-top: 10px;">
+   <div id="map-api-form" class="container-fluid" style="margin-top: 10px; display: none;">
       <div class="row">
          <div class="col-md-6">
             <h2>Tienes que asignar una clave de API de google maps:</h2>
