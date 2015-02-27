@@ -169,7 +169,7 @@
 </div>
 
 {if="$fsc->maps_api_key"}
-<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key={$fsc->maps_api_key}&sensor=TRUE"></script>
+<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key={$fsc->maps_api_key}&sensor=TRUE"></script>
 <script type="text/javascript">
    var map;
    function initialize2() {
@@ -227,7 +227,7 @@
          <div class="col-md-6">
             <h2>Tienes que asignar una clave de API de google maps:</h2>
             <ul>
-               <li>Accede a esta web: <a href="https://code.google.com/apis/console" target="_blank">https://code.google.com/apis/console</a></li>
+               <li>Accede a esta web: <a href="//code.google.com/apis/console" target="_blank">https://code.google.com/apis/console</a></li>
                <li>Ve a APIs y autenticación &gt; APIs. Busca <b>Google Maps JavaScript API v3</b> y actívala.</li>
                <li>Ve a APIs y autenticación &gt; Credenciales &gt; Acceso a API pública y pulsa el botón <b>Crear clave nueva</b>.</li>
             </ul>

@@ -55,6 +55,9 @@ class listado_sat extends fs_controller
       $this->detalles_sat = new detalles_sat();
       $this->pais = new pais();
       
+      /// ¿El usuario tiene permiso para eliminar en esta página?
+      $this->allow_delete = $this->user->allow_delete_on(__CLASS__);
+      
       $fsvar = new fs_var();
       if( isset($_POST['maps_api_key']) )
       {
