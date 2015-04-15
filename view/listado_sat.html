@@ -198,7 +198,8 @@
                map: map,
                position: results[0].geometry.location,
                title: "#{$value->nsat} {$value->nombre_cliente}\ntlf1: {$value->telefono1_cliente} tlf2: {$value->telefono2_cliente}\n{$value->averia}",
-               url: '{$value->url()}'
+               url: '{$value->url()}',
+               icon: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|{$value->color_estado()}'
             });
             google.maps.event.addListener(marker, 'click', function() {
                window.location.href = this.url;
