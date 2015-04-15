@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+require_model('estado_sat.php');
+
 class registro_sat extends fs_model
 {
    public $nsat;
@@ -38,10 +40,11 @@ class registro_sat extends fs_model
    public $telefono1_cliente;
    public $telefono2_cliente;
    
+   private static $estados;
+   
    public function __construct($s = FALSE)
    {
       parent::__construct('registros_sat', 'plugins/SAT/');
-      
       if($s)
       {
          $this->nsat = intval($s['nsat']);
@@ -87,6 +90,12 @@ class registro_sat extends fs_model
          $this->telefono1_cliente = '';
          $this->telefono2_cliente = '';
       }
+      
+      if( !isset(self::$estados) )
+      {
+         $estado = new estado_sat();
+         self::$estados = $estado->all();
+      }
    }
    
    public function install()
@@ -94,21 +103,7 @@ class registro_sat extends fs_model
       return '';
    }
    
-   public function estados()
-   {
-      $estados = array(
-          1 => 'Trabajo por empezar',
-          2 => 'Trabajo empezado',
-          3 => 'Aceptado Pendiente de Pieza',
-          4 => 'Aceptado pendiente empezar',
-          5 => 'Terminado pendiente de recoger',
-          6 => 'Terminado y recogido'
-      );
-      
-      return $estados;
-   }
-   
-    public function prioridad()
+   public function prioridad()
    {
       $prioridad = array(
           1 => 'Urgente',
@@ -120,23 +115,42 @@ class registro_sat extends fs_model
       return $prioridad;
    }
    
-   
-   public function nombre_estado()
-   {
-      $estados = $this->estados();
-      return $estados[$this->estado];
-   }
-   
-   public function nombre_estado_param($estado)
-   {
-      $estados = $this->estados();
-      return $estados[$estado];
-   }
-   
    public function nombre_prioridad()
    {
       $prioridades = $this->prioridad();
       return $prioridades[$this->prioridad];
+   }
+   
+   public function nombre_estado()
+   {
+      $nombre = '';
+      
+      foreach(self::$estados as $est)
+      {
+         if($est->id == $this->estado)
+         {
+            $nombre = $est->descripcion;
+            break;
+         }
+      }
+      
+      return $nombre;
+   }
+   
+   public function color_estado()
+   {
+      $color = 'FFFFFF';
+      
+      foreach(self::$estados as $est)
+      {
+         if($est->id == $this->estado)
+         {
+            $color = $est->color;
+            break;
+         }
+      }
+      
+      return $color;
    }
    
    public function url()
@@ -147,7 +161,7 @@ class registro_sat extends fs_model
       }
       else
       {
-         return 'index.php?page=listado_sat&id='.$this->nsat;
+         return 'index.php?page=editar_sat&id='.$this->nsat;
       }
    }
    

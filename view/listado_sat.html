@@ -1,7 +1,13 @@
 {include="header"}
 
 <script type="text/javascript">
+   function eliminar_estado(id)
+   {
+      if( confirm("¿Realmente desea eliminar el estado "+id+"?") )
+         window.location.href = '{$fsc->url()}&delete_estado='+id;
+   }
    $(document).ready(function () {
+      document.f_buscar_sat.query.focus();
       $("#b_nuevo_sat").click(function (event) {
          event.preventDefault();
          $("#modal_nuevo_sat").modal('show');
@@ -20,26 +26,11 @@
             }
          }
       });
-      $("#b_resultados").click(function(event) {
-         event.preventDefault();
-         $("#b_resultados").addClass('active');
-         $("#b_mapa").removeClass('active');
-         $("#map-canvas").hide();
-         $("#map-api-form").hide();
-         $("#resultados_sat").show();
-      });
-      $("#b_mapa").click(function(event) {
-         event.preventDefault();
-         $("#b_resultados").removeClass('active');
-         $("#b_mapa").addClass('active');
-         $("#resultados_sat").hide();
-         $("#map-canvas").show();
-         $("#map-api-form").show();
-      });
    });
 </script>
 
-<form id="f_edita_sat" name="f_edita_sat_lg" action="{$fsc->url()}" method="post" class="form">
+<form name="f_buscar_sat" action="{$fsc->url()}" method="post" class="form">
+   <input type="hidden" name="mostrar" value="resultados"/>
    <div class="container-fluid" style="margin-top: 10px; margin-bottom: 10px;">
       <div class="row">
          <div class="col-sm-6">
@@ -79,7 +70,7 @@
       <div class="row">
          <div class="col-sm-3">
             <div class="input-group">
-               <input type="text" class="form-control" name="buscar" placeholder="Buscar"/>
+               <input type="text" class="form-control" name="query" value="{$fsc->query}" placeholder="Buscar" autocomplete="off"/>
                <span class="input-group-btn">
                   <button class="btn btn-primary" type="submit" onclick="this.disabled = true; this.form.submit();">
                      <span class="glyphicon glyphicon-search"></span>
@@ -89,22 +80,22 @@
          </div>
          <div class="col-sm-2">
             <div class="form-group">
-               <input class="form-control datepicker" type="text" name="desde" placeholder="Desde..."/>
+               <input class="form-control datepicker" type="text" name="desde" value="{$fsc->busqueda['desde']}" placeholder="Desde..." autocomplete="off"/>
             </div>
          </div>
          <div class="col-sm-2">
             <div class="form-group">
-               <input class="form-control datepicker" type="text" name="hasta" placeholder="Hasta..."/>
+               <input class="form-control datepicker" type="text" name="hasta" value="{$fsc->busqueda['hasta']}" placeholder="Hasta..." autocomplete="off"/>
             </div>
          </div>
          <div class="col-sm-3">
             <div class="form-group">
                <select name="estado" class="form-control" onchange="this.form.submit();">
-                  <option value="activos">SAT activos</option>
-                  {loop="fsc->listar_estados()"}
-                  <option value="{$value['id_estado']}"{if="$fsc->busqueda['estado']==$value['id_estado']"} selected{/if}>{$value['nombre_estado']}</option>
+                  <option value=""{if="$fsc->busqueda['estado']=='todos'"} selected{/if}>Todos</option>
+                  <option value="">------</option>
+                  {loop="fsc->estado->all()"}
+                  <option value="{$value->id}"{if="$fsc->busqueda['estado']==$value->id"} selected{/if}>{$value->descripcion}</option>
                   {/loop}
-                  <option value="todos"{if="$fsc->busqueda['estado']=='todos'"} selected{/if}>Todos</option>
                </select>
             </div>
          </div>
@@ -123,25 +114,37 @@
 </form>
 
 <ul class="nav nav-tabs">
-  <li role="presentation" id="b_resultados" class="active">
-     <a href="#">Resultados</a>
-  </li>
-  <li role="presentation" id="b_mapa">
-     <a href="#">
-        <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
-     </a>
-  </li>
+   <li{if="$fsc->mostrar=='resultados'"} class="active"{/if}>
+      <a href="{$fsc->url()}&mostrar=resultados">
+         <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+         <span class="hidden-xs">&nbsp; Resultados</span>
+      </a>
+   </li>
+   <li{if="$fsc->mostrar=='mapa'"} class="active"{/if}>
+      <a href="{$fsc->url()}&mostrar=mapa">
+         <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
+         <span class="hidden-xs">&nbsp; Mapa</span>
+      </a>
+   </li>
+   <li{if="$fsc->mostrar=='opciones'"} class="active"{/if}>
+      <a href="{$fsc->url()}&mostrar=opciones">
+         <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+         <span class="hidden-xs">&nbsp; Opciones</span>
+      </a>
+   </li>
 </ul>
 
-<div id="resultados_sat" class="table-responsive">
+{if="$fsc->mostrar=='resultados'"}
+<div class="table-responsive">
    <table class="table table-hover">
       <thead>
          <tr>
             <th class="text-left">N sat</th>
-            <th class="text-left">Prioridad</th>
-            <th class="text-left">Fecha de comienzo</th>
-            <th class="text-left">Fecha de finalización</th>
-            <th class="text-left">Modelo</th>
+            {if="$fsc->sat_setup['sat_col_prioridad']"}<th class="text-left">Prioridad</th>{/if}
+            {if="$fsc->sat_setup['sat_col_fecha']"}<th class="text-left">Fecha</th>{/if}
+            {if="$fsc->sat_setup['sat_col_fechaini']"}<th class="text-left">Fecha inicio</th>{/if}
+            {if="$fsc->sat_setup['sat_col_fechafin']"}<th class="text-left">Fecha finalización</th>{/if}
+            {if="$fsc->sat_setup['sat_col_modelo']"}<th class="text-left">Modelo</th>{/if}
             <th class="text-left">Nombre</th>
             <th class="text-left">Telefono</th>
             <th class="text-left">Movil</th>
@@ -149,12 +152,13 @@
          </tr>
       </thead>
       {loop="fsc->resultado"}
-      <tr class="clickableRow{if condition="$value->estado==5"} bg-success{/if}" href="{$value->url()}">
+      <tr class="clickableRow" href="{$value->url()}" style="background-color: #{$value->color_estado()}">
          <td><a href="{$value->url()}">{$value->nsat}</a></td>
-         <td>{$value->nombre_prioridad()}</td>
-         <td>{$value->fcomienzo}</td>
-         <td>{$value->ffin}</td>
-         <td>{$value->modelo}</td>
+         {if="$fsc->sat_setup['sat_col_prioridad']"}<td>{$value->nombre_prioridad()}</td>{/if}
+         {if="$fsc->sat_setup['sat_col_fecha']"}<td>{$value->fentrada}</td>{/if}
+         {if="$fsc->sat_setup['sat_col_fechaini']"}<td>{$value->fcomienzo}</td>{/if}
+         {if="$fsc->sat_setup['sat_col_fechafin']"}<td>{$value->ffin}</td>{/if}
+         {if="$fsc->sat_setup['sat_col_modelo']"}<td>{$value->modelo}</td>{/if}
          <td>{$value->nombre_cliente}</td>
          <td>{$value->telefono1_cliente}</td>
          <td>{$value->telefono2_cliente}</td>
@@ -162,11 +166,12 @@
       </tr>
       {else}
       <tr class="bg-warning">
-         <td colspan="9">Sin resultados.</td>
+         <td colspan="10">Sin resultados.</td>
       </tr>
       {/loop}
    </table>
 </div>
+{elseif="$fsc->mostrar=='mapa'"}
 
 {if="$fsc->maps_api_key"}
 <script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key={$fsc->maps_api_key}&sensor=TRUE"></script>
@@ -192,7 +197,7 @@
             var marker = new google.maps.Marker({
                map: map,
                position: results[0].geometry.location,
-               title: '#{$value->nsat} {$value->nombre_cliente}',
+               title: "#{$value->nsat} {$value->nombre_cliente}\ntlf1: {$value->telefono1_cliente} tlf2: {$value->telefono2_cliente}\n{$value->averia}",
                url: '{$value->url()}'
             });
             google.maps.event.addListener(marker, 'click', function() {
@@ -208,7 +213,7 @@
       google.maps.event.addDomListener(window, 'load', initialize2);
    });
 </script>
-<div id="map-canvas" style="width:100%; height:800px;"></div>
+<div id="map-canvas" style="width:100%; height:800px; margin-top: 2px;"></div>
 <form action="{$fsc->url()}" method="post" class="form">
    <div id="map-api-form" style="margin: 10px; display: none;">
       <div class="form-group">
@@ -222,7 +227,7 @@
 </form>
 {else}
 <form action="{$fsc->url()}" method="post" class="form">
-   <div id="map-api-form" class="container-fluid" style="margin-top: 10px; display: none;">
+   <div id="map-api-form" class="container-fluid" style="margin-top: 10px;">
       <div class="row">
          <div class="col-md-6">
             <h2>Tienes que asignar una clave de API de google maps:</h2>
@@ -246,6 +251,136 @@
 </form>
 {/if}
 
+{else}
+<form action="{$fsc->url()}" method="post" class="form">
+   <input type="hidden" name="sat_setup" value="TRUE"/>
+   <div class="container-fluid" style="margin-top: 10px;">
+      <div class="row">
+         <div class="col-sm-3">
+            <div class="checkbox">
+               <label>
+                  <input type="checkbox" name="col_modelo" value="TRUE"{if="$fsc->sat_setup['sat_col_modelo']"} checked="checked"{/if}/>
+                  Usar columna <b>modelo</b>.
+               </label>
+            </div>
+         </div>
+         <div class="col-sm-3">
+            <div class="checkbox">
+               <label>
+                  <input type="checkbox" name="col_posicion" value="TRUE"{if="$fsc->sat_setup['sat_col_posicion']"} checked="checked"{/if}/>
+                  Usar columna <b>ubicación</b>.
+               </label>
+            </div>
+         </div>
+         <div class="col-sm-3">
+            <div class="checkbox">
+               <label>
+                  <input type="checkbox" name="col_accesorios" value="TRUE"{if="$fsc->sat_setup['sat_col_accesorios']"} checked="checked"{/if}/>
+                  Usar columna <b>accesorios</b>.
+               </label>
+            </div>
+         </div>
+         <div class="col-sm-3">
+            <div class="checkbox">
+               <label>
+                  <input type="checkbox" name="col_prioridad" value="TRUE"{if="$fsc->sat_setup['sat_col_prioridad']"} checked="checked"{/if}/>
+                  Usar columna <b>prioridad</b>.
+               </label>
+            </div>
+         </div>
+         <div class="col-sm-3">
+            <div class="checkbox">
+               <label>
+                  <input type="checkbox" name="col_fecha" value="TRUE"{if="$fsc->sat_setup['sat_col_fecha']"} checked="checked"{/if}/>
+                  Usar columna <b>fecha</b>.
+               </label>
+            </div>
+         </div>
+         <div class="col-sm-3">
+            <div class="checkbox">
+               <label>
+                  <input type="checkbox" name="col_fechaini" value="TRUE"{if="$fsc->sat_setup['sat_col_fechaini']"} checked="checked"{/if}/>
+                  Usar columna <b>fecha de inicio</b>.
+               </label>
+            </div>
+         </div>
+         <div class="col-sm-3">
+            <div class="checkbox">
+               <label>
+                  <input type="checkbox" name="col_fechafin" value="TRUE"{if="$fsc->sat_setup['sat_col_fechafin']"} checked="checked"{/if}/>
+                  Usar columna <b>fecha finalización</b>.
+               </label>
+            </div>
+         </div>
+         <div class="col-sm-3 text-right">
+            <button class="btn btn-sm btn-primary" type="submit" onclick="this.disabled=true; this.form.submit();">
+               <span class="glyphicon glyphicon-floppy-disk"></span> &nbsp; Guardar
+            </button>
+         </div>
+      </div>
+   </div>
+</form>
+<br/>
+<div class="table-responsive">
+   <table class="table">
+      <thead>
+         <tr>
+            <th class="text-left">Estado</th>
+            <th class="text-left">Descripción</th>
+            <th class="text-left">Color</th>
+            <th class="text-right">Acciones</th>
+         </tr>
+      </thead>
+      {loop="$fsc->estado->all()"}
+      <form action="{$fsc->url()}" method="post" class="form">
+         <input type="hidden" name="id_estado" value="{$value->id}"/>
+         <tr>
+            <td><div class="form-control">{$value->id}</div></td>
+            <td>
+               <input type="text" name="descripcion" value="{$value->descripcion}" class="form-control" autocomplete="off"/>
+            </td>
+            <td>
+               <input type="text" name="color" value="{$value->color}" class="form-control" autocomplete="off" maxlength="6"/>
+            </td>
+            <td class="text-right">
+               <div class="btn-group">
+                  {if="$fsc->allow_delete"}
+                  <a class="btn btn-sm btn-danger" href="#" onclick="eliminar_estado('{$value->id}')" title="Eliminar">
+                     <span class="glyphicon glyphicon-trash"></span>
+                  </a>
+                  {/if}
+                  <button type="submit" class="btn btn-sm btn-primary" onclick="this.disabled = true;this.form.submit();" title="Guardar">
+                     <span class="glyphicon glyphicon-floppy-disk"></span>
+                  </button>
+               </div>
+            </td>
+         </tr>
+      </form>
+      {/loop}
+      <form action="{$fsc->url()}" method="post" class="form">
+         <tr class="bg-info">
+            <td>
+               <input type="text" name="id_estado" value="{$fsc->estado->get_nuevo_id()}" class="form-control" autocomplete="off"/>
+            </td>
+            <td>
+               <input type="text" name="descripcion" value="" class="form-control" autocomplete="off"/>
+            </td>
+            <td>
+               <input type="text" name="color" value="FFFFFF" class="form-control" autocomplete="off" maxlength="6"/>
+            </td>
+            <td class="text-right">
+               <div class="btn-group">
+                  <button type="submit" class="btn btn-sm btn-primary" onclick="this.disabled = true;this.form.submit();" title="Guardar">
+                     <span class="glyphicon glyphicon-floppy-disk"></span>
+                  </button>
+               </div>
+            </td>
+         </tr>
+      </form>
+   </table>
+</div>
+{/if}
+
 <div class="modal" id="modal_nuevo_sat">
    <div class="modal-dialog">
       <div class="modal-content">
@@ -257,11 +392,13 @@
             <ul class="nav nav-tabs nav-justified" role="tablist">
                <li role="presentation" class="active">
                   <a href="#home" aria-controls="home" role="tab" data-toggle="tab">
-                     Buscar cliente
+                     <span class="glyphicon glyphicon-search" aria-hidden="true"></span> &nbsp; Buscar cliente
                   </a>
                </li>
                <li role="presentation">
-                  <a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Nuevo cliente</a>
+                  <a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">
+                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> &nbsp; Nuevo cliente
+                  </a>
                </li>
             </ul>
             <div class="modal-body">
@@ -269,7 +406,7 @@
                   <div role="tabpanel" class="tab-pane active" id="home" style="margin-top: 10px;">
                      <form name="f_nuevo_sat" class="form" action="index.php" method="get">
                         <input type="hidden" name="codcliente"/>
-                        <input type="hidden" name="opcion" value="nuevosat"/>
+                        <input type="hidden" name="nuevosat" value="TRUE"/>
                         <input type="hidden" name="page" value="{$fsc->page->name}"/>
                         <div class="input-group">
                            <input class="form-control" type="text" name="ac_cliente" id="ac_cliente" placeholder="Buscar..." autocomplete="off"/>
@@ -282,7 +419,8 @@
                      </form>
                   </div>
                   <div role="tabpanel" class="tab-pane" id="profile">
-                     <form name="f_nuevo_cliente" action="{$fsc->url()}&opcion=nuevosat" method="post" class="form">
+                     <form name="f_nuevo_cliente" action="{$fsc->url()}" method="post" class="form">
+                        <input type="hidden" name="nuevosat" value="TRUE"/>
                         <div class="form-group">
                            Nombre:
                            <input class="form-control" type="text" name="nombre" autocomplete="off"/>

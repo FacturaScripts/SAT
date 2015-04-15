@@ -1,20 +1,21 @@
 {include="header"}
 
+{if="$fsc->registro"}
 <script type="text/javascript">
    $(document).ready(function () {
       $("#b_eliminar").click(function(event) {
          event.preventDefault();
-         if (confirm("¿Realmente desea eliminar este registro SAT?"))
-            window.location.href = '{$fsc->url()}&delete={$fsc->resultado->nsat}';
+         if( confirm("¿Realmente desea eliminar este registro SAT?") )
+            window.location.href = 'index.php?page=listado_sat&delete={$fsc->registro->nsat}';
       });
    });
 </script>
 
-<form action="{$fsc->resultado->url()}" method="post" class="form">
+<form action="{$fsc->registro->url()}" method="post" class="form">
    <div class="container-fluid hidden-print" style="margin-top: 10px;">
       <div class="row">
          <div class="col-xs-8">
-            <a href="{$fsc->resultado->url()}" class="btn btn-sm btn-default" title="Recargar la página">
+            <a href="{$fsc->registro->url()}" class="btn btn-sm btn-default" title="Recargar la página">
                <span class="glyphicon glyphicon-refresh"></span>
             </a>
             <div class="btn-group">
@@ -22,7 +23,7 @@
                   <span class="glyphicon glyphicon-print"></span>
                   <span class="hidden-xs">&nbsp; Imprimir</span>
                </button>
-               <a href="{$fsc->url()}&codcliente={$fsc->resultado->codcliente}" class="btn btn-sm btn-default">
+               <a href="index.php?page=listado_sat&codcliente={$fsc->registro->codcliente}" class="btn btn-sm btn-default">
                   <span class="glyphicon glyphicon-user"></span>
                   <span class="hidden-xs">&nbsp; Más del cliente</span>
                </a>
@@ -41,7 +42,7 @@
                   <span class="hidden-sm hidden-xs">&nbsp; Eliminar</span>
                </a>
                {/if}
-               <button type="button" class="btn btn-sm btn-primary" onclick="this.disabled = true; this.form.submit();">
+               <button type="submit" class="btn btn-sm btn-primary" onclick="this.disabled = true;this.form.submit();">
                   <span class="glyphicon glyphicon-floppy-disk"></span>
                   <span class="hidden-xs">&nbsp; Guardar</span>
                </button>
@@ -51,30 +52,30 @@
       <div class="row">
          <div class="col-sm-12">
             <h2 style="margin-bottom: 0px;">
-               <a href="{$fsc->url()}">SAT</a> /
-               <a href="{$fsc->resultado->cliente_url()}">{$fsc->resultado->nombre_cliente}</a> /
-               {$fsc->resultado->nsat}
+               <a href="index.php?page=listado_sat">SAT</a> /
+               <a href="{$fsc->registro->cliente_url()}">{$fsc->registro->nombre_cliente}</a> /
+               {$fsc->registro->nsat}
             </h2>
-            <p>Fecha entrada: {$fsc->resultado->fentrada}</p>
+            <p>Fecha entrada: {$fsc->registro->fentrada}</p>
          </div>
       </div>
       <div class="row">
          <div class="col-sm-6">
             <div class="form-group">
                Nombre del cliente:
-               <input class="form-control" type="text" name="nombre" value="{$fsc->resultado->nombre_cliente}"/>
+               <input class="form-control" type="text" name="nombre" value="{$fsc->registro->nombre_cliente}"/>
             </div>
          </div>
          <div class="col-sm-3">
             <div class="form-group">
                Teléfono fijo:
-               <input class="form-control" type="text" name="telefono1" value="{$fsc->resultado->telefono1_cliente}"/>
+               <input class="form-control" type="text" name="telefono1" value="{$fsc->registro->telefono1_cliente}"/>
             </div>
          </div>
          <div class="col-sm-3">
             <div class="form-group">
                Teléfono móvil:
-               <input class="form-control" type="text" name="telefono2" value="{$fsc->resultado->telefono2_cliente}"/>
+               <input class="form-control" type="text" name="telefono2" value="{$fsc->registro->telefono2_cliente}"/>
             </div>
          </div>
       </div>
@@ -99,80 +100,99 @@
          <div role="tabpanel" class="tab-pane active" id="home">
             <div class="container-fluid" style="margin-top: 10px;">
                <div class="row">
+                  {if="$fsc->sat_setup['sat_col_modelo']"}
                   <div class="col-md-9">
                      <div class="form-group">
                         Modelo:
-                        <input class="form-control" type="text" name="modelo" value="{$fsc->resultado->modelo}"/>
+                        <input class="form-control" type="text" name="modelo" value="{$fsc->registro->modelo}"/>
                      </div>
                   </div>
+                  {/if}
+                  {if="$fsc->sat_setup['sat_col_posicion']"}
                   <div class="col-md-3">
                      <div class="form-group">
-                        {if="$fsc->resultado->posicion==''"}
-                        <label STYLE="color:red">Posicion sin asignar</label>
+                        {if="$fsc->registro->posicion==''"}
+                        <label STYLE="color:red">Ubicación sin asignar</label>
                         {else}
-                        <label>Posicion:</label>
+                        <label>Ubicación:</label>
                         {/if}
-                        <input class="form-control" type="text" name="posicion" value="{$fsc->resultado->posicion}" placeholder="ubiciación del producto en el almacén"/>
+                        <input class="form-control" type="text" name="posicion" value="{$fsc->registro->posicion}" placeholder="ubiciación del producto en el almacén"/>
                      </div>
                   </div>
+                  {/if}
                </div>
                <div class="row">
-                  <div class="col-md-6">
+                  <div class="{if="$fsc->sat_setup['sat_col_accesorios']"}col-md-6{else}col-md-12{/if}">
                      <div class="form-group">
                         Avería:
-                        <textarea class="form-control" name="averia" rows="5">{$fsc->resultado->averia}</textarea>
+                        <textarea class="form-control" name="averia" rows="5">{$fsc->registro->averia}</textarea>
                      </div>
                   </div>
+                  {if="$fsc->sat_setup['sat_col_accesorios']"}
                   <div class="col-md-6">
                      <div class="form-group">
                         Accesorios:
-                        <textarea class="form-control" name="accesorios" rows="5">{$fsc->resultado->accesorios}</textarea>
+                        <textarea class="form-control" name="accesorios" rows="5">{$fsc->registro->accesorios}</textarea>
                      </div>
                   </div>
+                  {/if}
                </div>
                <div class="row">
+                  {if="$fsc->sat_setup['sat_col_prioridad']"}
                   <div class="col-md-3">
                      <div class="form-group">
                         Prioridad:
                         <select name="prioridad" class="form-control">
-                           {loop="fsc->listar_prioridad()"}
-                           {if="$value['id_prioridad'] == $fsc->resultado->prioridad"}
+                        {loop="fsc->listar_prioridad()"}
+                           {if="$value['id_prioridad'] == $fsc->registro->prioridad"}
                            <option value="{$value['id_prioridad']}" selected>{$value['nombre_prioridad']}</option>
                            {else}
                            <option value="{$value['id_prioridad']}">{$value['nombre_prioridad']}</option>
                            {/if}
-                           {/loop}
+                        {/loop}
                         </select>
                      </div>
                   </div>
+                  {/if}
                   <div class="col-md-3">
                      <div class="form-group">
                         Estado:
                         <select name="estado" class="form-control">
-                           {loop="fsc->listar_estados()"}
-                           {if="$value['id_estado'] == $fsc->resultado->estado"}
-                           <option value="{$value['id_estado']}" selected>{$value['nombre_estado']}</option>
+                        {loop="fsc->estado->all()"}
+                           {if="$value->id == $fsc->registro->estado"}
+                           <option value="{$value->id}" selected>{$value->descripcion}</option>
                            {else}
-                           <option value="{$value['id_estado']}">{$value['nombre_estado']}</option>
+                           <option value="{$value->id}">{$value->descripcion}</option>
                            {/if}
-                           {/loop}
+                        {/loop}
                         </select>
                      </div>
                   </div>
+                  {if="$fsc->sat_setup['sat_col_fecha']"}
                   <div class="col-md-3">
                      <div class="form-group">
-                        Fecha de comienzo:
-                        <input class="form-control datepicker" type="text" name="fcomienzo" value="{$fsc->resultado->fcomienzo}"/>
+                        Fecha:
+                        <input class="form-control datepicker" type="text" name="fecha" value="{$fsc->registro->fentrada}"/>
                      </div>
                   </div>
+                  {/if}
+                  {if="$fsc->sat_setup['sat_col_fechaini']"}
+                  <div class="col-md-3">
+                     <div class="form-group">
+                        Fecha inicio:
+                        <input class="form-control datepicker" type="text" name="fcomienzo" value="{$fsc->registro->fcomienzo}"/>
+                     </div>
+                  </div>
+                  {/if}
+                  {if="$fsc->sat_setup['sat_col_fechafin']"}
                   <div class="col-md-3">
                      <div class="form-group">
                         Fecha finalización:
-                        <input class="form-control datepicker" type="text" name="ffin" value="{$fsc->resultado->ffin}"/>
+                        <input class="form-control datepicker" type="text" name="ffin" value="{$fsc->registro->ffin}"/>
                      </div>
                   </div>
+                  {/if}
                </div>
-               
             </div>
          </div>
          <div role="tabpanel" class="tab-pane" id="detalles">
@@ -204,7 +224,7 @@
             
             <div class="form-group" style="padding: 10px;">
                Observaciones:
-               <textarea class="form-control" name="observaciones" rows="9">{$fsc->resultado->observaciones}</textarea>
+               <textarea class="form-control" name="observaciones" rows="9">{$fsc->registro->observaciones}</textarea>
             </div>
          </div>
       </div>
@@ -215,35 +235,35 @@
    <div class="col-xs-6">
       <div class="col-xs-12">
          <strong>Nombre:</strong><br/>
-         {$fsc->resultado->nombre_cliente}
+         {$fsc->registro->nombre_cliente}
       </div>
       <div class="col-xs-6">
          <strong>Teléfono fijo:</strong><br/>
-         {$fsc->resultado->telefono1_cliente}
+         {$fsc->registro->telefono1_cliente}
       </div>
       <div class="col-xs-6">
          <strong>Teléfono móvil:</strong><br/>
-         {$fsc->resultado->telefono2_cliente}
+         {$fsc->registro->telefono2_cliente}
       </div>
       <div class="col-xs-12">
          <strong>Modelo:</strong><br/>
-         {$fsc->resultado->modelo}
+         {$fsc->registro->modelo}
       </div>
       <div class="col-xs-12">
          <strong>Averia:</strong><br/>
-         {$fsc->resultado->averia}
+         {$fsc->registro->averia}
       </div>
       <div class="col-xs-12">
          <strong>Accesorios:</strong><br/>
-         {$fsc->resultado->accesorios}
+         {$fsc->registro->accesorios}
       </div>
       <div class="col-xs-12">
          <strong>Observaciones:</strong><br/>
-         {$fsc->resultado->observaciones}
+         {$fsc->registro->observaciones}
       </div>
    </div>
    <div class="col-xs-6">
-      <h4><strong>Numero de SAT: {$fsc->resultado->nsat}</strong><br/></h4>
+      <h4><strong>Numero de SAT: {$fsc->registro->nsat}</strong><br/></h4>
       <p>Condiciondes del deposito:<br/>
          Los presupuestos realizados tienen una<br/>
          validez de 15 dias<br/>
@@ -267,12 +287,12 @@
    <p>...............................................................................................................................................................................................</p>
    <div class="col-xs-6">
       <div class="col-xs-6">
-         <h4><strong>Numero de SAT: {$fsc->resultado->nsat}</strong><br/></h4>
+         <h4><strong>Numero de SAT: {$fsc->registro->nsat}</strong><br/></h4>
       </div>
       <div class="col-xs-6">
          <h4><strong>Prioridad</strong><br/>
             {loop="fsc->listar_prioridad()"}
-            {if="$value['id_prioridad'] == $fsc->resultado->prioridad"}
+            {if="$value['id_prioridad'] == $fsc->registro->prioridad"}
             {$value['nombre_prioridad']}
             {/if}
             {/loop}
@@ -280,39 +300,39 @@
       </div>
       <div class="col-xs-6">
          <h4><strong>Comienzo:</strong><br/>
-            {$fsc->resultado->fcomienzo}</h4>
+            {$fsc->registro->fcomienzo}</h4>
       </div>
       <div class="col-xs-6">
          <h4><strong>Final:</strong><br/>
-            {$fsc->resultado->ffin}</h4>
+            {$fsc->registro->ffin}</h4>
       </div>
       <div class="col-xs-12">
          <strong>Nombre:</strong><br/>
-         {$fsc->resultado->nombre_cliente}
+         {$fsc->registro->nombre_cliente}
       </div>
       <div class="col-xs-6">
          <strong>Teléfono fijo:</strong><br/>
-         {$fsc->resultado->telefono1_cliente}
+         {$fsc->registro->telefono1_cliente}
       </div>
       <div class="col-xs-6">
          <strong>Teléfono móvil:</strong><br/>
-         {$fsc->resultado->telefono2_cliente}
+         {$fsc->registro->telefono2_cliente}
       </div>
       <div class="col-xs-12">
          <strong>Modelo:</strong><br/>
-         {$fsc->resultado->modelo}
+         {$fsc->registro->modelo}
       </div>
       <div class="col-xs-12">
          <strong>Averia:</strong><br/>
-         {$fsc->resultado->averia}
+         {$fsc->registro->averia}
       </div>
       <div class="col-xs-12">
          <strong>Accesorios:</strong><br/>
-         {$fsc->resultado->accesorios}
+         {$fsc->registro->accesorios}
       </div>
       <div class="col-xs-12">
          <strong>Observaciones:</strong><br/>
-         {$fsc->resultado->observaciones}
+         {$fsc->registro->observaciones}
       </div>
    </div>
 
@@ -342,7 +362,7 @@
 <div class="modal fade" id="modal_nuevo_detalle">
    <div class="modal-dialog">
       <div class="modal-content">
-         <form name="f_nuevo_cliente" action="{$fsc->resultado->url()}#detalles" method="post" class="form">
+         <form name="f_nuevo_cliente" action="{$fsc->registro->url()}#detalles" method="post" class="form">
             <div class="modal-header">
                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                <h4 class="modal-title">Nuevo detalle</h4>
@@ -359,5 +379,10 @@
       </div>
    </div>
 </div>
+{else}
+<div class="thumbnail">
+   <img src="view/img/fuuu_face.png" alt="fuuuuu"/>
+</div>
+{/if}
 
 {include="footer"}
