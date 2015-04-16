@@ -157,7 +157,7 @@
                   <div class="col-md-3">
                      <div class="form-group">
                         Estado:
-                        <select name="estado" class="form-control">
+                        <select name="estado" class="form-control" style="background-color: #{$fsc->registro->color_estado()};">
                         {loop="fsc->estado->all()"}
                            {if="$value->id == $fsc->registro->estado"}
                            <option value="{$value->id}" selected>{$value->descripcion}</option>

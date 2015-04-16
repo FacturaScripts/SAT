@@ -42,13 +42,13 @@ class estado_sat extends fs_model
       {
          $this->id = NULL;
          $this->descripcion = '';
-         $this->color = '00FF00';
+         $this->color = '000000';
       }
    }
    
    protected function install()
    {
-      return "INSERT INTO estados_sat (id,descripcion,color) VALUES ('1','Nuevo','C2DAF5'),('2','Terminado','FFFFFF');";
+      return "INSERT INTO estados_sat (id,descripcion,color) VALUES ('1','Nuevo','D9EDF7'),('2','Terminado','DFF0D8');";
    }
    
    public function get($id)

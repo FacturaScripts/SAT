@@ -253,6 +253,8 @@
 {/if}
 
 {else}
+<script type="text/javascript" src="plugins/SAT/view/jscolor/jscolor.js"></script>
+
 <form action="{$fsc->url()}" method="post" class="form">
    <input type="hidden" name="sat_setup" value="TRUE"/>
    <div class="container-fluid" style="margin-top: 10px;">
@@ -341,7 +343,7 @@
                <input type="text" name="descripcion" value="{$value->descripcion}" class="form-control" autocomplete="off"/>
             </td>
             <td>
-               <input type="text" name="color" value="{$value->color}" class="form-control" autocomplete="off" maxlength="6"/>
+               <input type="text" name="color" value="{$value->color}" class="form-control color" autocomplete="off" maxlength="6"/>
             </td>
             <td class="text-right">
                <div class="btn-group">
@@ -367,7 +369,7 @@
                <input type="text" name="descripcion" value="" class="form-control" autocomplete="off"/>
             </td>
             <td>
-               <input type="text" name="color" value="FFFFFF" class="form-control" autocomplete="off" maxlength="6"/>
+               <input type="text" name="color" value="FFFFFF" class="form-control color" autocomplete="off" maxlength="6"/>
             </td>
             <td class="text-right">
                <div class="btn-group">
@@ -379,6 +381,19 @@
          </tr>
       </form>
    </table>
+</div>
+<div class="container-fluid">
+   <div class="row">
+      <div class="col-sm-12">
+         <div class="page-header">
+            <h1>¿Necesitas más opciones o características?</h1>
+         </div>
+         <p>
+            Pues no seas tímido, <a href="https://www.facturascripts.com/store/producto/1h-de-desarrollo/" target="_blank">compra 1h de desarrollo</a>
+            y dime a qué quieres que la dedique ;-)
+         </p>
+      </div>
+   </div>
 </div>
 {/if}
 
