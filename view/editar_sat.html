@@ -63,19 +63,19 @@
          <div class="col-sm-6">
             <div class="form-group">
                Nombre del cliente:
-               <input class="form-control" type="text" name="nombre" value="{$fsc->registro->nombre_cliente}"/>
+               <input class="form-control" type="text" name="nombre" value="{$fsc->registro->nombre_cliente}" autocomplete="off"/>
             </div>
          </div>
          <div class="col-sm-3">
             <div class="form-group">
                Teléfono fijo:
-               <input class="form-control" type="text" name="telefono1" value="{$fsc->registro->telefono1_cliente}"/>
+               <input class="form-control" type="text" name="telefono1" value="{$fsc->registro->telefono1_cliente}" autocomplete="off"/>
             </div>
          </div>
          <div class="col-sm-3">
             <div class="form-group">
                Teléfono móvil:
-               <input class="form-control" type="text" name="telefono2" value="{$fsc->registro->telefono2_cliente}"/>
+               <input class="form-control" type="text" name="telefono2" value="{$fsc->registro->telefono2_cliente}" autocomplete="off"/>
             </div>
          </div>
       </div>
@@ -93,6 +93,7 @@
             <a href="#detalles" aria-controls="detalles" role="tab" data-toggle="tab">
                <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
                <span class="hidden-xs">&nbsp; Detalles</span>
+               <span class="hidden-sm badge">{$fsc->registro->num_detalles()}</span>
             </a>
          </li>
       </ul>
@@ -104,7 +105,7 @@
                   <div class="col-md-9">
                      <div class="form-group">
                         Modelo:
-                        <input class="form-control" type="text" name="modelo" value="{$fsc->registro->modelo}"/>
+                        <input class="form-control" type="text" name="modelo" value="{$fsc->registro->modelo}" autocomplete="off"/>
                      </div>
                   </div>
                   {/if}
@@ -172,7 +173,7 @@
                   <div class="col-md-3">
                      <div class="form-group">
                         Fecha:
-                        <input class="form-control datepicker" type="text" name="fecha" value="{$fsc->registro->fentrada}"/>
+                        <input class="form-control datepicker" type="text" name="fecha" value="{$fsc->registro->fentrada}" autocomplete="off"/>
                      </div>
                   </div>
                   {/if}
@@ -180,7 +181,7 @@
                   <div class="col-md-3">
                      <div class="form-group">
                         Fecha inicio:
-                        <input class="form-control datepicker" type="text" name="fcomienzo" value="{$fsc->registro->fcomienzo}"/>
+                        <input class="form-control datepicker" type="text" name="fcomienzo" value="{$fsc->registro->fcomienzo}" autocomplete="off"/>
                      </div>
                   </div>
                   {/if}
@@ -188,7 +189,7 @@
                   <div class="col-md-3">
                      <div class="form-group">
                         Fecha finalización:
-                        <input class="form-control datepicker" type="text" name="ffin" value="{$fsc->registro->ffin}"/>
+                        <input class="form-control datepicker" type="text" name="ffin" value="{$fsc->registro->ffin}" autocomplete="off"/>
                      </div>
                   </div>
                   {/if}

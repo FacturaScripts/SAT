@@ -190,7 +190,7 @@ class listado_sat extends fs_controller
          else
             $this->new_error_msg('Error al guardar el estado.');
       }
-      else if($this->query != '')
+      else if( isset($_POST['query']) )
       {
          /// esto es para una búsqueda
          $this->busqueda['desde'] = $_POST['desde'];

@@ -96,10 +96,9 @@ class editar_sat extends fs_controller
             $cliente = $cli0->get($this->registro->codcliente);
             if($cliente AND isset($_POST['nombre']) )
             {
-               $cliente->nombre = $_POST['nombre'];
-               $cliente->nombrecomercial = $_POST['nombre'];
-               $cliente->telefono1 = $_POST['telefono1'];
-               $cliente->telefono2 = $_POST['telefono2'];
+               $this->registro->nombre_cliente = $cliente->nombre = $cliente->nombrecomercial = $_POST['nombre'];
+               $this->registro->telefono1_cliente = $cliente->telefono1 = $_POST['telefono1'];
+               $this->registro->telefono2_cliente = $cliente->telefono2 = $_POST['telefono2'];
                
                if( $cliente->save() )
                {

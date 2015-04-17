@@ -257,7 +257,7 @@ class registro_sat extends fs_model
       return $this->db->exec("DELETE FROM registros_sat WHERE nsat = ".$this->var2str($this->nsat).";");
    }
    
-   public function all()
+   public function all($offset = 0)
    {
       $satlist = array();
       
@@ -265,8 +265,8 @@ class registro_sat extends fs_model
          registros_sat.modelo, registros_sat.codcliente, clientes.nombre, clientes.telefono1, clientes.telefono2,
          registros_sat.estado, registros_sat.averia, registros_sat.accesorios, registros_sat.observaciones, registros_sat.posicion
          FROM registros_sat, clientes
-         WHERE registros_sat.codcliente = clientes.codcliente AND registros_sat.estado != 6 ORDER BY fcomienzo ASC, prioridad ASC,ffin ASC, fentrada ASC;";
-      $data = $this->db->select($sql);
+         WHERE registros_sat.codcliente = clientes.codcliente ORDER BY fcomienzo ASC, prioridad ASC,ffin ASC, fentrada ASC";
+      $data = $this->db->select_limit($sql, FS_ITEM_LIMIT, $offset);
       if($data)
       {
          foreach($data as $d)
@@ -276,8 +276,7 @@ class registro_sat extends fs_model
       return $satlist;
    }
    
-   
-   public function all_from_cliente($cod)
+   public function all_from_cliente($cod, $offset = 0)
    {
       $satlist = array();
       
@@ -285,7 +284,7 @@ class registro_sat extends fs_model
          registros_sat.modelo, registros_sat.codcliente, clientes.nombre, clientes.telefono1, clientes.telefono2,
          registros_sat.estado, registros_sat.averia, registros_sat.accesorios, registros_sat.observaciones, registros_sat.posicion
          FROM registros_sat, clientes
-         WHERE registros_sat.codcliente = clientes.codcliente AND registros_sat.estado != 6 AND registros_sat.codcliente = ".$this->var2str($cod)."
+         WHERE registros_sat.codcliente = clientes.codcliente AND registros_sat.codcliente = ".$this->var2str($cod)."
          ORDER BY fcomienzo ASC, prioridad ASC,ffin ASC, fentrada ASC;";
       $data = $this->db->select($sql);
       if($data)
@@ -297,9 +296,10 @@ class registro_sat extends fs_model
       return $satlist;
    }
    
-   public function search($buscar='', $desde='', $hasta='', $estado='activos',$orden="nsat")
+   public function search($buscar='', $desde='', $hasta='', $estado='', $orden='nsat', $offset=0)
    {
       $satlist = array();
+      $buscar = strtolower( trim($buscar) );
       
       $sql = "SELECT registros_sat.nsat, registros_sat.prioridad,registros_sat.fentrada, registros_sat.fcomienzo, registros_sat.ffin,
          registros_sat.modelo, registros_sat.codcliente, clientes.nombre, clientes.telefono1, clientes.telefono2, registros_sat.estado,
@@ -309,8 +309,16 @@ class registro_sat extends fs_model
       
       if($buscar != '')
       {
-         $sql .= " AND ((lower(modelo) LIKE lower('%".$buscar."%')) OR (registros_sat.observaciones LIKE '%".$buscar."%')
-            OR (lower(nombre) LIKE lower('%".$buscar."%')))";
+         if( is_numeric($buscar) )
+         {
+            $sql .= " AND (nsat = ".$this->var2str($buscar)." OR lower(modelo) LIKE '%".$buscar."%'
+               OR registros_sat.observaciones LIKE '%".$buscar."%' OR lower(nombre) LIKE '%".$buscar."%')";
+         }
+         else
+         {
+            $sql .= " AND (lower(modelo) LIKE '%".$buscar."%' OR registros_sat.observaciones LIKE '%".$buscar."%'
+               OR lower(nombre) LIKE '%".$buscar."%')";
+         }
       }
       
       if($desde != '')
@@ -323,21 +331,14 @@ class registro_sat extends fs_model
          $sql .= " AND fcomienzo <= ".$this->var2str($hasta);
       }
       
-      if($estado != "todos" AND $estado != "activos")
+      if($estado != '')
       {
-         $sql .= " AND registros_sat.estado = ".$estado;
+         $sql .= " AND registros_sat.estado = ".$this->var2str($estado);
       }
-      else 
-      {
-          if($estado == "activos")
-          {
-              $sql .= " AND registros_sat.estado != 6";
-          }
-          //si no entra en ninguno de los 2 if anteriores muestra todos los estados.
-      }
+      
       $sql.= " ORDER BY ".$orden." ASC ";
       
-      $data = $this->db->select($sql.";");
+      $data = $this->db->select_limit($sql, FS_ITEM_LIMIT, $offset);
       if($data)
       {
          foreach($data as $d)
