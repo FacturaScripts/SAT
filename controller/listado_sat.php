@@ -358,7 +358,7 @@ class listado_sat extends fs_controller
       $fsext0->from = __CLASS__;
       $fsext0->to = 'ventas_cliente';
       $fsext0->type = 'button';
-      $fsext0->text = 'SAT';
+      $fsext0->text = '<span class="glyphicon glyphicon-list" aria-hidden="true"></span> &nbsp; SAT';
       
       if( !$fsext0->save() )
       {

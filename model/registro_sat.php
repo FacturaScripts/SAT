@@ -121,6 +121,27 @@ class registro_sat extends fs_model
       return $prioridades[$this->prioridad];
    }
    
+   public function estrellas_prioridad()
+   {
+      $retorno = '';
+      $estrella = '<span class="glyphicon glyphicon-star" aria-hidden="true"></span>';
+      $no_estrella = '<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>';
+      
+      $i = 0;
+      for(;$i < 5-$this->prioridad; $i++)
+      {
+         $retorno .= $estrella;
+      }
+      
+      while($i < 4)
+      {
+         $retorno .= $no_estrella;
+         $i++;
+      }
+      
+      return $retorno;
+   }
+   
    public function nombre_estado()
    {
       $nombre = '';
@@ -151,6 +172,16 @@ class registro_sat extends fs_model
       }
       
       return $color;
+   }
+   
+   public function averia_resume($len = 90)
+   {
+      if( strlen($this->averia) > $len )
+      {
+         return substr($this->averia, 0, $len-3).'...';
+      }
+      else
+         return $this->averia;
    }
    
    public function url()
@@ -225,6 +256,7 @@ class registro_sat extends fs_model
       if( $this->exists() )
       {
          $sql = "UPDATE registros_sat SET prioridad = ".$this->var2str($this->prioridad).",
+            fentrada = ".$this->var2str($this->fentrada).",
             fcomienzo = ".$this->var2str($this->fcomienzo).", ffin = ".$this->var2str($this->ffin).",
             modelo = ".$this->var2str($this->modelo).", codcliente = ".$this->var2str($this->codcliente).",
             estado = ".$this->var2str($this->estado).", averia = ".$this->var2str($this->averia).",
@@ -265,7 +297,7 @@ class registro_sat extends fs_model
          registros_sat.modelo, registros_sat.codcliente, clientes.nombre, clientes.telefono1, clientes.telefono2,
          registros_sat.estado, registros_sat.averia, registros_sat.accesorios, registros_sat.observaciones, registros_sat.posicion
          FROM registros_sat, clientes
-         WHERE registros_sat.codcliente = clientes.codcliente ORDER BY fcomienzo ASC, prioridad ASC,ffin ASC, fentrada ASC";
+         WHERE registros_sat.codcliente = clientes.codcliente ORDER BY nsat DESC";
       $data = $this->db->select_limit($sql, FS_ITEM_LIMIT, $offset);
       if($data)
       {
@@ -285,7 +317,7 @@ class registro_sat extends fs_model
          registros_sat.estado, registros_sat.averia, registros_sat.accesorios, registros_sat.observaciones, registros_sat.posicion
          FROM registros_sat, clientes
          WHERE registros_sat.codcliente = clientes.codcliente AND registros_sat.codcliente = ".$this->var2str($cod)."
-         ORDER BY fcomienzo ASC, prioridad ASC,ffin ASC, fentrada ASC;";
+         ORDER BY nsat DESC;";
       $data = $this->db->select($sql);
       if($data)
       {
@@ -336,7 +368,12 @@ class registro_sat extends fs_model
          $sql .= " AND registros_sat.estado = ".$this->var2str($estado);
       }
       
-      $sql.= " ORDER BY ".$orden." ASC ";
+      if($orden == 'prioridad')
+      {
+         $sql.= " ORDER BY ".$orden." ASC ";
+      }
+      else
+         $sql.= " ORDER BY ".$orden." DESC ";
       
       $data = $this->db->select_limit($sql, FS_ITEM_LIMIT, $offset);
       if($data)

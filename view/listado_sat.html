@@ -146,28 +146,26 @@
             {if="$fsc->sat_setup['sat_col_fechaini']"}<th class="text-left">Fecha inicio</th>{/if}
             {if="$fsc->sat_setup['sat_col_fechafin']"}<th class="text-left">Fecha finalización</th>{/if}
             {if="$fsc->sat_setup['sat_col_modelo']"}<th class="text-left">Modelo</th>{/if}
-            <th class="text-left">Nombre</th>
-            <th class="text-left">Telefono</th>
-            <th class="text-left">Movil</th>
+            <th class="text-left">Cliente</th>
+            <th class="text-left">Avería</th>
             <th class="text-right">Estado</th>
          </tr>
       </thead>
       {loop="fsc->resultado"}
       <tr class="clickableRow" href="{$value->url()}" style="background-color: #{$value->color_estado()}">
          <td><a href="{$value->url()}">{$value->nsat}</a></td>
-         {if="$fsc->sat_setup['sat_col_prioridad']"}<td>{$value->nombre_prioridad()}</td>{/if}
+         {if="$fsc->sat_setup['sat_col_prioridad']"}<td>{$value->estrellas_prioridad()}</td>{/if}
          {if="$fsc->sat_setup['sat_col_fecha']"}<td>{$value->fentrada}</td>{/if}
          {if="$fsc->sat_setup['sat_col_fechaini']"}<td>{$value->fcomienzo}</td>{/if}
          {if="$fsc->sat_setup['sat_col_fechafin']"}<td>{$value->ffin}</td>{/if}
          {if="$fsc->sat_setup['sat_col_modelo']"}<td>{$value->modelo}</td>{/if}
          <td>{$value->nombre_cliente}</td>
-         <td>{$value->telefono1_cliente}</td>
-         <td>{$value->telefono2_cliente}</td>
+         <td>{$value->averia_resume()}</td>
          <td class="text-right">{$value->nombre_estado()}</td>
       </tr>
       {else}
       <tr class="bg-warning">
-         <td colspan="10">Sin resultados.</td>
+         <td colspan="9">Sin resultados.</td>
       </tr>
       {/loop}
    </table>

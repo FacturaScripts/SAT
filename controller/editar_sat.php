@@ -115,7 +115,7 @@ class editar_sat extends fs_controller
             
             if( isset($_POST['fecha']) )
             {
-               $this->registro->fecha = $_POST['fecha'];
+               $this->registro->fentrada = $_POST['fecha'];
             }
             
             if( isset($_POST['fcomienzo']) )
