@@ -34,6 +34,7 @@ class listado_sat extends fs_controller
    public $estado;
    public $maps_api_key;
    public $mostrar;
+   public $offset;
    public $pais;
    public $registro_sat;
    public $resultado;
@@ -59,7 +60,6 @@ class listado_sat extends fs_controller
       
       /// ¿El usuario tiene permiso para eliminar en esta página?
       $this->allow_delete = $this->user->allow_delete_on(__CLASS__);
-      
       
       /// leemos la API key de google maps de la base de datos o del formulario
       $fsvar = new fs_var();
@@ -109,6 +109,11 @@ class listado_sat extends fs_controller
          $this->sat_setup['sat_col_fechafin'] = TRUE;
       }
       
+      $this->offset = 0;
+      if( isset($_GET['offset']) )
+      {
+         $this->offset = intval($_GET['offset']);
+      }
       
       /// ¿Qué pestaña hay que mostrar?
       $this->mostrar = 'resultados';
@@ -190,25 +195,38 @@ class listado_sat extends fs_controller
          else
             $this->new_error_msg('Error al guardar el estado.');
       }
-      else if( isset($_POST['query']) )
+      else if( isset($_REQUEST['query']) )
       {
          /// esto es para una búsqueda
-         $this->busqueda['desde'] = $_POST['desde'];
-         $this->busqueda['hasta'] = $_POST['hasta'];
-         $this->busqueda['estado'] = $_POST['estado'];
-         $this->busqueda['orden'] = $_POST['orden'];
+         $this->busqueda['desde'] = $_REQUEST['desde'];
+         $this->busqueda['hasta'] = $_REQUEST['hasta'];
+         $this->busqueda['estado'] = $_REQUEST['estado'];
+         $this->busqueda['orden'] = $_REQUEST['orden'];
          
-         $this->resultado = $this->registro_sat->search($this->query, $this->busqueda['desde'], $this->busqueda['hasta'], $this->busqueda['estado'], $this->busqueda['orden']);
+         $this->resultado = $this->registro_sat->search(
+                 $this->query,
+                 $this->busqueda['desde'],
+                 $this->busqueda['hasta'],
+                 $this->busqueda['estado'],
+                 $this->busqueda['orden'],
+                 $this->offset
+         );
       }
-      else if (isset($_GET['codcliente']))
+      else if( isset($_GET['codcliente']) )
       {
          /// listado del cliente
-         $this->resultado = $this->registro_sat->all_from_cliente($_GET['codcliente']);
+         $this->resultado = $this->registro_sat->all_from_cliente($_GET['codcliente'], $this->offset);
       }
       else
       {
          $this->meter_extensiones();
-         $this->resultado = $this->registro_sat->all();
+         
+         if( isset($_GET['ejemplos']) )
+         {
+            $this->ejemplos();
+         }
+         
+         $this->resultado = $this->registro_sat->all($this->offset);
       }
    }
    
@@ -222,7 +240,6 @@ class listado_sat extends fs_controller
          if( isset($_POST['averia']) )
          {
             $this->cliente_s->nombre = $_POST['nombre'];
-            $this->cliente_s->nombrecomercial = $_POST['nombre'];
             $this->cliente_s->telefono1 = $_POST['telefono1'];
             $this->cliente_s->telefono2 = $_POST['telefono2'];
             
@@ -242,7 +259,7 @@ class listado_sat extends fs_controller
          $cliente = new cliente();
          $cliente->codcliente = $cliente->get_new_codigo();
          $cliente->nombre = $_POST['nombre'];
-         $cliente->nombrecomercial = $_POST['nombre'];
+         $cliente->nombrecomercial = $_POST['nombrecomercial'];
          $cliente->cifnif = $_POST['cifnif'];
          $cliente->telefono1 = $_POST['telefono1'];
          $cliente->telefono2 = $_POST['telefono2'];
@@ -364,5 +381,88 @@ class listado_sat extends fs_controller
       {
          $this->new_error_msg('Imposible guardar los datos de la extensión.');
       }
+   }
+   
+   private function ejemplos()
+   {
+      $estados = $this->estado->all();
+      
+      foreach($this->cliente->all() as $cli)
+      {
+         $sat = new registro_sat();
+         $sat->codcliente = $cli->codcliente;
+         $sat->nombre_cliente = $cli->nombre;
+         $sat->telefono1_cliente = $cli->telefono1;
+         $sat->telefono2_cliente = $cli->telefono2;
+         
+         foreach($estados as $est)
+         {
+            $sat->estado = $est->id;
+            
+            if(mt_rand(0, 1) == 0)
+            {
+               break;
+            }
+         }
+         
+         $sat->averia = $this->random_string();
+         $sat->prioridad = mt_rand(1, 4);
+         $sat->fcomienzo = Date( mt_rand(1, 27).'-'.mt_rand(1, 12).'-Y' );
+         $sat->save();
+      }
+   }
+   
+   public function anterior_url()
+   {
+      $url = '';
+      $extra = '';
+      
+      if( isset($_GET['codcliente']) )
+      {
+         $extra = '&codcliente='.$_GET['codcliente'];
+      }
+      else
+      {
+         $extra = '&mostrar='.$this->mostrar.'&query='.$this->query.'&desde='.$this->busqueda['desde'].
+                 '&hasta='.$this->busqueda['hasta'].'&estado='.$this->busqueda['estado'].'&orden='.$this->busqueda['orden'];
+      }
+      
+      if($this->query != '' AND $this->offset > 0)
+      {
+         $url = $this->url()."&query=".$this->query."&offset=".($this->offset-FS_ITEM_LIMIT).$extra;
+      }
+      else if($this->query == '' AND $this->offset > 0)
+      {
+         $url = $this->url()."&offset=".($this->offset-FS_ITEM_LIMIT).$extra;
+      }
+      
+      return $url;
+   }
+   
+   public function siguiente_url()
+   {
+      $url = '';
+      $extra = '';
+      
+      if( isset($_GET['codcliente']) )
+      {
+         $extra = '&codcliente='.$_GET['codcliente'];
+      }
+      else
+      {
+         $extra = '&mostrar='.$this->mostrar.'&query='.$this->query.'&desde='.$this->busqueda['desde'].
+                 '&hasta='.$this->busqueda['hasta'].'&estado='.$this->busqueda['estado'].'&orden='.$this->busqueda['orden'];
+      }
+      
+      if($this->query != '' AND count($this->resultado) == FS_ITEM_LIMIT)
+      {
+         $url = $this->url()."&query=".$this->query."&offset=".($this->offset+FS_ITEM_LIMIT).$extra;
+      }
+      else if($this->query == '' AND count($this->resultado) == FS_ITEM_LIMIT)
+      {
+         $url = $this->url()."&offset=".($this->offset+FS_ITEM_LIMIT).$extra;
+      }
+      
+      return $url;
    }
 }

@@ -370,10 +370,10 @@ class registro_sat extends fs_model
       
       if($orden == 'prioridad')
       {
-         $sql.= " ORDER BY ".$orden." ASC ";
+         $sql.= " ORDER BY prioridad ASC, fcomienzo ASC";
       }
       else
-         $sql.= " ORDER BY ".$orden." DESC ";
+         $sql.= " ORDER BY ".$orden." DESC, prioridad ASC";
       
       $data = $this->db->select_limit($sql, FS_ITEM_LIMIT, $offset);
       if($data)

@@ -30,7 +30,7 @@
 </script>
 
 <form name="f_buscar_sat" action="{$fsc->url()}" method="post" class="form">
-   <input type="hidden" name="mostrar" value="resultados"/>
+   <input type="hidden" name="mostrar" value="{$fsc->mostrar}"/>
    <div class="container-fluid" style="margin-top: 10px; margin-bottom: 10px;">
       <div class="row">
          <div class="col-sm-6">
@@ -104,8 +104,12 @@
                <select name="orden" class="form-control" onchange="this.form.submit();">
                   <option value="nsat"{if="$fsc->busqueda['orden']=='nsat'"} selected{/if}>Orden: Nº de sat</option>
                   <option value="fentrada"{if="$fsc->busqueda['orden']=='fentrada'"} selected{/if}>Fecha</option>
+                  {if="$fsc->sat_setup['sat_col_fechaini']"}
                   <option value="fcomienzo"{if="$fsc->busqueda['orden']=='fcomienzo'"} selected{/if}>Fecha de comienzo</option>
+                  {/if}
+                  {if="$fsc->sat_setup['sat_col_fechafin']"}
                   <option value="ffin"{if="$fsc->busqueda['orden']=='ffin'"} selected{/if}>Fecha de finalizacion</option>
+                  {/if}
                   <option value="prioridad"{if="$fsc->busqueda['orden']=='prioridad'"} selected{/if}>Prioridad</option>
                </select>
             </div>
@@ -159,7 +163,10 @@
          {if="$fsc->sat_setup['sat_col_fechaini']"}<td>{$value->fcomienzo}</td>{/if}
          {if="$fsc->sat_setup['sat_col_fechafin']"}<td>{$value->ffin}</td>{/if}
          {if="$fsc->sat_setup['sat_col_modelo']"}<td>{$value->modelo}</td>{/if}
-         <td>{$value->nombre_cliente}</td>
+         <td>
+            {$value->nombre_cliente}
+            <a href="{$fsc->url()}&codcliente={$value->codcliente}" class="cancel_clickable" title="Ver más registros de {$value->nombre_cliente}">[+]</a>
+         </td>
          <td>{$value->averia_resume()}</td>
          <td class="text-right">{$value->nombre_estado()}</td>
       </tr>
@@ -170,6 +177,23 @@
       {/loop}
    </table>
 </div>
+<ul class="pager">
+   {if="$fsc->anterior_url()!=''"}
+   <li class="previous">
+      <a href="{$fsc->anterior_url()}">
+         <span class="glyphicon glyphicon-chevron-left"></span> &nbsp; Anteriores
+      </a>
+   </li>
+   {/if}
+   
+   {if="$fsc->siguiente_url()!=''"}
+   <li class="next">
+      <a href="{$fsc->siguiente_url()}">
+         Siguientes &nbsp; <span class="glyphicon glyphicon-chevron-right"></span>
+      </a>
+   </li>
+   {/if}
+</ul>
 {elseif="$fsc->mostrar=='mapa'"}
 
 {if="$fsc->maps_api_key"}
@@ -182,17 +206,10 @@
          mapTypeId: google.maps.MapTypeId.ROADMAP
       };
       map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-      if (navigator.geolocation) {
-         navigator.geolocation.getCurrentPosition(function (position) {
-            initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            map.setCenter(initialLocation);
-         });
-      }
       geocoder = new google.maps.Geocoder();
       {loop="$fsc->resultado"}
       geocoder.geocode( { 'address': '{$value->direccion_cliente()}' }, function(results, status) {
          if (status == google.maps.GeocoderStatus.OK) {
-            map.setCenter(results[0].geometry.location);
             var marker = new google.maps.Marker({
                map: map,
                position: results[0].geometry.location,
@@ -208,6 +225,12 @@
          }
       });
       {/loop}
+      if(navigator.geolocation) {
+         navigator.geolocation.getCurrentPosition(function (position) {
+            initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            map.setCenter(initialLocation);
+         });
+      }
    }
    $(document).ready(function() {
       google.maps.event.addDomListener(window, 'load', initialize2);
@@ -439,6 +462,10 @@
                         <div class="form-group">
                            Nombre:
                            <input class="form-control" type="text" name="nombre" autocomplete="off"/>
+                        </div>
+                        <div class="form-group">
+                           Razón social:
+                           <input class="form-control" type="text" name="nombrecomercial" autocomplete="off"/>
                         </div>
                         <div class="form-group">
                            {#FS_CIFNIF#}:
