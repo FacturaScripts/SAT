@@ -96,9 +96,10 @@ class editar_sat extends fs_controller
             $cliente = $cli0->get($this->registro->codcliente);
             if($cliente AND isset($_POST['nombre']) )
             {
-               $this->registro->nombre_cliente = $cliente->nombre = $cliente->nombrecomercial = $_POST['nombre'];
+               $this->registro->nombre_cliente = $cliente->nombre = $cliente->razonsocial = $_POST['nombre'];
                $this->registro->telefono1_cliente = $cliente->telefono1 = $_POST['telefono1'];
                $this->registro->telefono2_cliente = $cliente->telefono2 = $_POST['telefono2'];
+               $this->registro->contacto = $_POST['contacto'];
                
                if( $cliente->save() )
                {
@@ -153,6 +154,12 @@ class editar_sat extends fs_controller
                ///si tiene el mismo estado no tiene que hacer nada sino tiene que añadir un detalle
                $this->registro->estado = $_POST['estado'];
                $this->agrega_detalle_estado($_POST['estado']);
+            }
+            
+            $this->registro->codagente = NULL;
+            if($_POST['codagente'] != '')
+            {
+               $this->registro->codagente = $_POST['codagente'];
             }
             
             if( $this->registro->save() )
@@ -237,5 +244,11 @@ class editar_sat extends fs_controller
             $this->new_error_msg('Imposible guardar el detalle.');
          }
       }
+   }
+   
+   public function listado_agentes()
+   {
+      $age0 = new agente();
+      return $age0->all();
    }
 }

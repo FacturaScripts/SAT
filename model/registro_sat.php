@@ -34,6 +34,8 @@ class registro_sat extends fs_model
    public $accesorios;
    public $observaciones;
    public $posicion;
+   public $contacto;
+   public $codagente;
    
    /// Estos datos los usas, pero no los guardas en la base de datos
    public $nombre_cliente;
@@ -53,11 +55,15 @@ class registro_sat extends fs_model
          
          $this->fcomienzo = NULL;
          if( isset($s['fcomienzo']) )
+         {
             $this->fcomienzo = date('d-m-Y', strtotime($s['fcomienzo']));
+         }
          
          $this->ffin = NULL;
          if( isset($s['ffin']) )
+         {
             $this->ffin = date('d-m-Y', strtotime($s['ffin']));
+         }
          
          $this->modelo = $s['modelo'];
          $this->codcliente = $s['codcliente'];
@@ -70,6 +76,18 @@ class registro_sat extends fs_model
          $this->nombre_cliente = $s['nombre'];
          $this->telefono1_cliente = $s['telefono1'];
          $this->telefono2_cliente = $s['telefono2'];
+         
+         $this->contacto = '';
+         if( isset($s['contacto']) )
+         {
+            $this->contacto = $s['contacto'];
+         }
+         
+         $this->codagente = NULL;
+         if( isset($s['codagente']) )
+         {
+            $this->codagente = $s['codagente'];
+         }
       }
       else
       {
@@ -85,6 +103,8 @@ class registro_sat extends fs_model
          $this->accesorios = '';
          $this->observaciones = '';
          $this->posicion = '';
+         $this->contacto = '';
+         $this->codagente = NULL;
          
          $this->nombre_cliente = '';
          $this->telefono1_cliente = '';
@@ -219,11 +239,10 @@ class registro_sat extends fs_model
    
    public function get($id)
    {
-      $sql = "SELECT registros_sat.nsat, registros_sat.prioridad,registros_sat.fentrada, registros_sat.fcomienzo, registros_sat.ffin,
-         registros_sat.modelo, registros_sat.codcliente, clientes.nombre, clientes.telefono1, clientes.telefono2,
-         registros_sat.estado, registros_sat.averia, registros_sat.accesorios, registros_sat.observaciones, registros_sat.posicion
-         FROM registros_sat, clientes
-         WHERE registros_sat.codcliente = clientes.codcliente AND nsat = ".$this->var2str($id).";";
+      $sql = "SELECT r.nsat,r.prioridad,r.fentrada,r.fcomienzo,r.ffin,r.modelo,r.codcliente,
+         c.nombre,c.telefono1,c.telefono2,r.estado,r.averia,r.accesorios,r.observaciones,r.posicion,
+         r.contacto,r.codagente FROM registros_sat r, clientes c
+         WHERE r.codcliente = c.codcliente AND r.nsat = ".$this->var2str($id).";";
       $data = $this->db->select($sql);
       if($data)
       {
@@ -252,27 +271,44 @@ class registro_sat extends fs_model
       $this->accesorios = $this->no_html($this->accesorios);
       $this->observaciones = $this->no_html($this->observaciones);
       $this->posicion = $this->no_html($this->posicion);
+      $this->contacto = $this->no_html($this->contacto);
       
       if( $this->exists() )
       {
-         $sql = "UPDATE registros_sat SET prioridad = ".$this->var2str($this->prioridad).",
-            fentrada = ".$this->var2str($this->fentrada).",
-            fcomienzo = ".$this->var2str($this->fcomienzo).", ffin = ".$this->var2str($this->ffin).",
-            modelo = ".$this->var2str($this->modelo).", codcliente = ".$this->var2str($this->codcliente).",
-            estado = ".$this->var2str($this->estado).", averia = ".$this->var2str($this->averia).",
-            accesorios = ".$this->var2str($this->accesorios).", observaciones = ".$this->var2str($this->observaciones).",
-            posicion = ".$this->var2str($this->posicion)." WHERE nsat = ".$this->var2str($this->nsat).";";
+         $sql = "UPDATE registros_sat SET prioridad = ".$this->var2str($this->prioridad).
+                 ", fentrada = ".$this->var2str($this->fentrada).
+                 ", fcomienzo = ".$this->var2str($this->fcomienzo).
+                 ", ffin = ".$this->var2str($this->ffin).
+                 ", modelo = ".$this->var2str($this->modelo).
+                 ", codcliente = ".$this->var2str($this->codcliente).
+                 ", estado = ".$this->var2str($this->estado).
+                 ", averia = ".$this->var2str($this->averia).
+                 ", accesorios = ".$this->var2str($this->accesorios).
+                 ", observaciones = ".$this->var2str($this->observaciones).
+                 ", posicion = ".$this->var2str($this->posicion).
+                 ", contacto = ".$this->var2str($this->contacto).
+                 ", codagente = ".$this->var2str($this->codagente).
+                 " WHERE nsat = ".$this->var2str($this->nsat).";";
          
          return $this->db->exec($sql);
       }
       else
       {
          $sql = "INSERT INTO registros_sat (prioridad,fentrada,fcomienzo,ffin,modelo,codcliente,estado,
-            averia,accesorios,observaciones) VALUES (".$this->var2str($this->prioridad).",
-            ".$this->var2str($this->fentrada).",".$this->var2str($this->fcomienzo).",".$this->var2str($this->ffin).",
-            ".$this->var2str($this->modelo).",".$this->var2str($this->codcliente).",
-            ".$this->var2str($this->estado).",".$this->var2str($this->averia).",
-            ".$this->var2str($this->accesorios).",".$this->var2str($this->observaciones).");";
+            averia,accesorios,observaciones,posicion,contacto,codagente) VALUES
+                  (".$this->var2str($this->prioridad).
+                 ",".$this->var2str($this->fentrada).
+                 ",".$this->var2str($this->fcomienzo).
+                 ",".$this->var2str($this->ffin).
+                 ",".$this->var2str($this->modelo).
+                 ",".$this->var2str($this->codcliente).
+                 ",".$this->var2str($this->estado).
+                 ",".$this->var2str($this->averia).
+                 ",".$this->var2str($this->accesorios).
+                 ",".$this->var2str($this->observaciones).
+                 ",".$this->var2str($this->posicion).
+                 ",".$this->var2str($this->contacto).
+                 ",".$this->var2str($this->codagente).");";
          
          if( $this->db->exec($sql) )
          {
@@ -293,11 +329,10 @@ class registro_sat extends fs_model
    {
       $satlist = array();
       
-      $sql = "SELECT registros_sat.nsat, registros_sat.prioridad,registros_sat.fentrada, registros_sat.fcomienzo, registros_sat.ffin,
-         registros_sat.modelo, registros_sat.codcliente, clientes.nombre, clientes.telefono1, clientes.telefono2,
-         registros_sat.estado, registros_sat.averia, registros_sat.accesorios, registros_sat.observaciones, registros_sat.posicion
-         FROM registros_sat, clientes
-         WHERE registros_sat.codcliente = clientes.codcliente ORDER BY nsat DESC";
+      $sql = "SELECT r.nsat,r.prioridad,r.fentrada,r.fcomienzo,r.ffin,r.modelo,
+         r.codcliente,c.nombre,c.telefono1,c.telefono2,r.estado,r.averia,r.accesorios,
+         r.observaciones,r.posicion,r.contacto,r.codagente FROM registros_sat r, clientes c
+         WHERE r.codcliente = c.codcliente ORDER BY r.nsat DESC";
       $data = $this->db->select_limit($sql, FS_ITEM_LIMIT, $offset);
       if($data)
       {
@@ -312,12 +347,10 @@ class registro_sat extends fs_model
    {
       $satlist = array();
       
-      $sql = "SELECT registros_sat.nsat, registros_sat.prioridad,registros_sat.fentrada, registros_sat.fcomienzo, registros_sat.ffin,
-         registros_sat.modelo, registros_sat.codcliente, clientes.nombre, clientes.telefono1, clientes.telefono2,
-         registros_sat.estado, registros_sat.averia, registros_sat.accesorios, registros_sat.observaciones, registros_sat.posicion
-         FROM registros_sat, clientes
-         WHERE registros_sat.codcliente = clientes.codcliente AND registros_sat.codcliente = ".$this->var2str($cod)."
-         ORDER BY nsat DESC;";
+      $sql = "SELECT r.nsat,r.prioridad,r.fentrada,r.fcomienzo,r.ffin,r.modelo,
+         r.codcliente,c.nombre,c.telefono1,c.telefono2,r.estado,r.averia,r.accesorios,
+         r.observaciones,r.posicion,r.contacto,r.codagente FROM registros_sat r, clientes c
+         WHERE r.codcliente = c.codcliente AND r.codcliente = ".$this->var2str($cod)." ORDER BY r.nsat DESC;";
       $data = $this->db->select($sql);
       if($data)
       {
@@ -333,22 +366,21 @@ class registro_sat extends fs_model
       $satlist = array();
       $buscar = strtolower( trim($buscar) );
       
-      $sql = "SELECT registros_sat.nsat, registros_sat.prioridad,registros_sat.fentrada, registros_sat.fcomienzo, registros_sat.ffin,
-         registros_sat.modelo, registros_sat.codcliente, clientes.nombre, clientes.telefono1, clientes.telefono2, registros_sat.estado,
-         registros_sat.averia, registros_sat.accesorios, registros_sat.observaciones, registros_sat.posicion
-         FROM registros_sat, clientes
-         WHERE registros_sat.codcliente = clientes.codcliente";
+      $sql = "SELECT r.nsat,r.prioridad,r.fentrada,r.fcomienzo,r.ffin,r.modelo,
+         r.codcliente,c.nombre,c.telefono1,c.telefono2,r.estado,r.averia,r.accesorios,
+         r.observaciones,r.posicion,r.contacto,r.codagente FROM registros_sat r, clientes c
+         WHERE r.codcliente = c.codcliente";
       
       if($buscar != '')
       {
          if( is_numeric($buscar) )
          {
             $sql .= " AND (nsat = ".$this->var2str($buscar)." OR lower(modelo) LIKE '%".$buscar."%'
-               OR registros_sat.observaciones LIKE '%".$buscar."%' OR lower(nombre) LIKE '%".$buscar."%')";
+               OR r.observaciones LIKE '%".$buscar."%' OR lower(nombre) LIKE '%".$buscar."%')";
          }
          else
          {
-            $sql .= " AND (lower(modelo) LIKE '%".$buscar."%' OR registros_sat.observaciones LIKE '%".$buscar."%'
+            $sql .= " AND (lower(modelo) LIKE '%".$buscar."%' OR r.observaciones LIKE '%".$buscar."%'
                OR lower(nombre) LIKE '%".$buscar."%')";
          }
       }
@@ -365,7 +397,7 @@ class registro_sat extends fs_model
       
       if($estado != '')
       {
-         $sql .= " AND registros_sat.estado = ".$this->var2str($estado);
+         $sql .= " AND r.estado = ".$this->var2str($estado);
       }
       
       if($orden == 'prioridad')

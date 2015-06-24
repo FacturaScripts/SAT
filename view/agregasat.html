@@ -13,29 +13,35 @@
 <form name="f_nuevo_sat" action="{$fsc->url()}&nuevosat=TRUE&codcliente={$fsc->cliente_s->codcliente}" method="post" class="form">
    <div class="container-fluid">
       <div class="row">
-         <div class="col-md-12">
+         <div class="col-sm-12">
             <h3>
                Nuevo registro SAT para el cliente <a href="{$fsc->cliente_s->url()}">{$fsc->cliente_s->nombre}</a>
             </h3>
          </div>
       </div>
       <div class="row">
-         <div class="col-md-6">
+         <div class="col-sm-5">
             <div class="form-group">
                Nombre del cliente:
-               <input class="form-control" type="text" name="nombre" value="{$fsc->cliente_s->nombre}"/>
+               <input class="form-control" type="text" name="nombre" value="{$fsc->cliente_s->nombre}" autocomplete="off"/>
             </div>
          </div>
-         <div class="col-md-3">
+         <div class="col-sm-2">
             <div class="form-group">
                Teléfono fijo:
-               <input class="form-control" type="text" name="telefono1" value="{$fsc->cliente_s->telefono1}"/>
+               <input class="form-control" type="text" name="telefono1" value="{$fsc->cliente_s->telefono1}" autocomplete="off"/>
             </div>
          </div>
-         <div class="col-md-3">
+         <div class="col-sm-2">
             <div class="form-group">
                Teléfono móvil:
-               <input class="form-control" type="text" name="telefono2" value="{$fsc->cliente_s->telefono2}"/>
+               <input class="form-control" type="text" name="telefono2" value="{$fsc->cliente_s->telefono2}" autocomplete="off"/>
+            </div>
+         </div>
+         <div class="col-sm-3">
+            <div class="form-group">
+               Persona de contacto:
+               <input class="form-control" type="text" name="contacto" autocomplete="off"/>
             </div>
          </div>
       </div>
@@ -59,7 +65,7 @@
             <div class="container-fluid" style="margin-top: 10px;">
                {if="$fsc->sat_setup['sat_col_modelo']"}
                <div class="row">
-                  <div class="col-md-12">
+                  <div class="col-sm-12">
                      <div class="form-group">
                         <strong>Modelo:</strong>
                         <input class="form-control" type="text" name="modelo"/>
@@ -68,14 +74,14 @@
                </div>
                {/if}
                <div class="row">
-                  <div class="{if="$fsc->sat_setup['sat_col_accesorios']"}col-md-6{else}col-md-12{/if}">
+                  <div class="{if="$fsc->sat_setup['sat_col_accesorios']"}col-sm-6{else}col-sm-12{/if}">
                      <div class="form-group">
                         Avería:
                         <textarea class="form-control" name="averia" rows="5"></textarea>
                      </div>
                   </div>
                   {if="$fsc->sat_setup['sat_col_accesorios']"}
-                  <div class="col-md-6">
+                  <div class="col-sm-6">
                      <div class="form-group">
                         Accesorios/extra:
                         <textarea class="form-control" name="accesorios" rows="5"></textarea>
@@ -85,7 +91,7 @@
                </div>
                <div class="row">
                   {if="$fsc->sat_setup['sat_col_prioridad']"}
-                  <div class="col-md-4">
+                  <div class="col-sm-2">
                      <div class="form-group">
                         Prioridad:
                         <select name="prioridad" class="form-control">
@@ -100,30 +106,52 @@
                      </div>
                   </div>
                   {/if}
+                  <div class="col-sm-3">
+                     <div class="form-group">
+                        Estado:
+                        <select name="estado" class="form-control">
+                           {loop="fsc->estado->all()"}
+                           <option value="{$value->id}">{$value->descripcion}</option>
+                           {/loop}
+                        </select>
+                     </div>
+                  </div>
                   {if="$fsc->sat_setup['sat_col_fecha']"}
-                  <div class="col-md-4">
+                  <div class="col-sm-2">
                      <div class="form-group">
                         Fecha:
-                        <input class="form-control datepicker" type="text" name="fecha" value="{$fsc->today()}"/>
+                        <input class="form-control datepicker" type="text" name="fecha" value="{$fsc->today()}" autocomplete="off"/>
                      </div>
                   </div>
                   {/if}
                   {if="$fsc->sat_setup['sat_col_fechaini']"}
-                  <div class="col-md-4">
+                  <div class="col-sm-2">
                      <div class="form-group">
                         Fecha inicio:
-                        <input class="form-control datepicker" type="text" name="fcomienzo" value="{$fsc->today()}"/>
+                        <input class="form-control datepicker" type="text" name="fcomienzo" value="{$fsc->today()}" autocomplete="off"/>
                      </div>
                   </div>
                   {/if}
                   {if="$fsc->sat_setup['sat_col_fechafin']"}
-                  <div class="col-md-4">
+                  <div class="col-sm-2">
                      <div class="form-group">
                         Fecha finalización:
-                        <input class="form-control datepicker" type="text" name="ffin"/>
+                        <input class="form-control datepicker" type="text" name="ffin" autocomplete="off"/>
                      </div>
                   </div>
                   {/if}
+                  <div class="col-sm-3">
+                     <div class="form-group">
+                        Empleado asignado:
+                        <select name="codagente" class="form-control">
+                           <option value="">Ninguno</option>
+                           <option value="">------</option>
+                           {loop="$fsc->agente->all()"}
+                           <option value="{$value->codagente}">{$value->get_fullname()}</option>
+                           {/loop}
+                        </select>
+                     </div>
+                  </div>
                </div>
             </div>
          </div>
@@ -140,7 +168,7 @@
    
    <div class="container-fluid">
       <div class="row">
-         <div class="col-md-12">
+         <div class="col-sm-12">
             <a href="{$fsc->url()}" class="btn btn-sm btn-default">
                <span class="glyphicon glyphicon-remove"></span> &nbsp; Cancelar
             </a>

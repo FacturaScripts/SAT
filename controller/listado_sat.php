@@ -28,6 +28,7 @@ require_model('registro_sat.php');
 
 class listado_sat extends fs_controller
 {
+   public $agente;
    public $busqueda;
    public $cliente;
    public $cliente_s;
@@ -51,6 +52,7 @@ class listado_sat extends fs_controller
     */
    protected function private_core()
    {
+      $this->agente = new agente();
       $this->busqueda = array('desde' => '', 'hasta' => '', 'estado' => '', 'orden' => 'nsat');
       $this->cliente = new cliente();
       $this->cliente_s = FALSE;
@@ -161,6 +163,8 @@ class listado_sat extends fs_controller
          }
          else
             $this->new_error_msg('Registro no encontrado.');
+         
+         $this->resultado = $this->registro_sat->all($this->offset);
       }
       else if( isset($_GET['delete_estado']) )
       {
@@ -258,8 +262,7 @@ class listado_sat extends fs_controller
          /// nuevo cliente
          $cliente = new cliente();
          $cliente->codcliente = $cliente->get_new_codigo();
-         $cliente->nombre = $_POST['nombre'];
-         $cliente->nombrecomercial = $_POST['nombrecomercial'];
+         $cliente->nombre = $cliente->razonsocial = $_POST['nombre'];
          $cliente->cifnif = $_POST['cifnif'];
          $cliente->telefono1 = $_POST['telefono1'];
          $cliente->telefono2 = $_POST['telefono2'];
@@ -296,6 +299,7 @@ class listado_sat extends fs_controller
       if($this->cliente_s)
       {
          $this->registro_sat->codcliente = $this->cliente_s->codcliente;
+         $this->registro_sat->contacto = $_POST['contacto'];
          
          if( isset($_POST['modelo']) )
          {
@@ -335,6 +339,13 @@ class listado_sat extends fs_controller
          if( isset($_POST['prioridad']) )
          {
             $this->registro_sat->prioridad = $_POST['prioridad'];
+         }
+         
+         $this->registro_sat->estado = $_POST['estado'];
+         
+         if($_POST['codagente'] != '')
+         {
+            $this->registro_sat->codagente = $_POST['codagente'];
          }
          
          if ($this->registro_sat->save())

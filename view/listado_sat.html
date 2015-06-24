@@ -126,9 +126,8 @@
       </a>
    </li>
    <li{if="$fsc->mostrar=='mapa'"} class="active"{/if}>
-      <a href="{$fsc->url()}&mostrar=mapa">
+      <a href="{$fsc->url()}&mostrar=mapa" title="Mapa">
          <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
-         <span class="hidden-xs">&nbsp; Mapa</span>
       </a>
    </li>
    <li{if="$fsc->mostrar=='opciones'"} class="active"{/if}>
@@ -462,10 +461,6 @@
                         <div class="form-group">
                            Nombre:
                            <input class="form-control" type="text" name="nombre" autocomplete="off"/>
-                        </div>
-                        <div class="form-group">
-                           Razón social:
-                           <input class="form-control" type="text" name="nombrecomercial" autocomplete="off"/>
                         </div>
                         <div class="form-group">
                            {#FS_CIFNIF#}:

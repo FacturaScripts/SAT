@@ -61,6 +61,15 @@
       <nombre>posicion</nombre>
       <tipo>text</tipo>
    </columna>
+   <columna>
+      <nombre>contacto</nombre>
+      <tipo>character varying(200)</tipo>
+   </columna>
+   <columna>
+      <nombre>codagente</nombre>
+      <tipo>character varying(10)</tipo>
+      <nulo>YES</nulo>
+   </columna>
    <restriccion>
       <nombre>registros_sat_pkey</nombre>
       <consulta>PRIMARY KEY (nsat)</consulta>
