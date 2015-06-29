@@ -1,0 +1,6 @@
+Permite gestionar un Servicio de Asistencia Técnica.
+<ul>
+<li>Permite añadir/editar/eliminar incidencias.</li>
+<li>Se pueden mostrar las incidencias en un mapa.</li>
+<li>Estados configurables para la incidencias.</li>
+</ul>

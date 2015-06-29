@@ -1,0 +1,183 @@
+{include="header"}
+
+<script type="text/javascript">
+   $(document).ready(function () {
+      {if="$fsc->sat_setup['sat_col_modelo']"}
+      document.f_nuevo_sat.modelo.focus();
+      {else}
+      document.f_nuevo_sat.averia.focus();
+      {/if}
+   });
+</script>
+
+<form name="f_nuevo_sat" action="{$fsc->url()}&nuevosat=TRUE&codcliente={$fsc->cliente_s->codcliente}" method="post" class="form">
+   <div class="container-fluid">
+      <div class="row">
+         <div class="col-sm-12">
+            <h3>
+               Nuevo registro SAT para el cliente <a href="{$fsc->cliente_s->url()}">{$fsc->cliente_s->nombre}</a>
+            </h3>
+         </div>
+      </div>
+      <div class="row">
+         <div class="col-sm-5">
+            <div class="form-group">
+               Nombre del cliente:
+               <input class="form-control" type="text" name="nombre" value="{$fsc->cliente_s->nombre}" autocomplete="off"/>
+            </div>
+         </div>
+         <div class="col-sm-2">
+            <div class="form-group">
+               Teléfono fijo:
+               <input class="form-control" type="text" name="telefono1" value="{$fsc->cliente_s->telefono1}" autocomplete="off"/>
+            </div>
+         </div>
+         <div class="col-sm-2">
+            <div class="form-group">
+               Teléfono móvil:
+               <input class="form-control" type="text" name="telefono2" value="{$fsc->cliente_s->telefono2}" autocomplete="off"/>
+            </div>
+         </div>
+         <div class="col-sm-3">
+            <div class="form-group">
+               Persona de contacto:
+               <input class="form-control" type="text" name="contacto" autocomplete="off"/>
+            </div>
+         </div>
+      </div>
+   </div>
+   
+   <div id="content">
+      <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+         <li class="active">
+            <a href="#datos" data-toggle="tab">
+               <span class="glyphicon glyphicon-wrench"></span> &nbsp; Datos generales
+            </a>
+         </li>
+         <li>
+            <a href="#observacioes" data-toggle="tab">
+               <span class="glyphicon glyphicon-eye-open"></span> &nbsp; Observaciones
+            </a>
+         </li>
+      </ul>
+      <div id="my-tab-content" class="tab-content">
+         <div class="tab-pane active" id="datos">
+            <div class="container-fluid" style="margin-top: 10px;">
+               {if="$fsc->sat_setup['sat_col_modelo']"}
+               <div class="row">
+                  <div class="col-sm-12">
+                     <div class="form-group">
+                        <strong>Modelo:</strong>
+                        <input class="form-control" type="text" name="modelo"/>
+                     </div>
+                  </div>
+               </div>
+               {/if}
+               <div class="row">
+                  <div class="{if="$fsc->sat_setup['sat_col_accesorios']"}col-sm-6{else}col-sm-12{/if}">
+                     <div class="form-group">
+                        Avería:
+                        <textarea class="form-control" name="averia" rows="5"></textarea>
+                     </div>
+                  </div>
+                  {if="$fsc->sat_setup['sat_col_accesorios']"}
+                  <div class="col-sm-6">
+                     <div class="form-group">
+                        Accesorios/extra:
+                        <textarea class="form-control" name="accesorios" rows="5"></textarea>
+                     </div>
+                  </div>
+                  {/if}
+               </div>
+               <div class="row">
+                  {if="$fsc->sat_setup['sat_col_prioridad']"}
+                  <div class="col-sm-2">
+                     <div class="form-group">
+                        Prioridad:
+                        <select name="prioridad" class="form-control">
+                        {loop="$fsc->listar_prioridad()"}
+                           {if="$value['id_prioridad'] == 3"}
+                           <option value="{$value['id_prioridad']}" selected>{$value['nombre_prioridad']}</option>
+                           {else}
+                           <option value="{$value['id_prioridad']}">{$value['nombre_prioridad']}</option>
+                           {/if}
+                        {/loop}
+                        </select>
+                     </div>
+                  </div>
+                  {/if}
+                  <div class="col-sm-3">
+                     <div class="form-group">
+                        Estado:
+                        <select name="estado" class="form-control">
+                           {loop="fsc->estado->all()"}
+                           <option value="{$value->id}">{$value->descripcion}</option>
+                           {/loop}
+                        </select>
+                     </div>
+                  </div>
+                  {if="$fsc->sat_setup['sat_col_fecha']"}
+                  <div class="col-sm-2">
+                     <div class="form-group">
+                        Fecha:
+                        <input class="form-control datepicker" type="text" name="fecha" value="{$fsc->today()}" autocomplete="off"/>
+                     </div>
+                  </div>
+                  {/if}
+                  {if="$fsc->sat_setup['sat_col_fechaini']"}
+                  <div class="col-sm-2">
+                     <div class="form-group">
+                        Fecha inicio:
+                        <input class="form-control datepicker" type="text" name="fcomienzo" value="{$fsc->today()}" autocomplete="off"/>
+                     </div>
+                  </div>
+                  {/if}
+                  {if="$fsc->sat_setup['sat_col_fechafin']"}
+                  <div class="col-sm-2">
+                     <div class="form-group">
+                        Fecha finalización:
+                        <input class="form-control datepicker" type="text" name="ffin" autocomplete="off"/>
+                     </div>
+                  </div>
+                  {/if}
+                  <div class="col-sm-3">
+                     <div class="form-group">
+                        Empleado asignado:
+                        <select name="codagente" class="form-control">
+                           <option value="">Ninguno</option>
+                           <option value="">------</option>
+                           {loop="$fsc->agente->all()"}
+                           <option value="{$value->codagente}">{$value->get_fullname()}</option>
+                           {/loop}
+                        </select>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="tab-pane" id="observacioes">
+            <div style="padding: 10px;">
+               <div class="form-group">
+                  Observaciones:
+                  <textarea class="form-control" name="observaciones" rows="8"></textarea>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   
+   <div class="container-fluid">
+      <div class="row">
+         <div class="col-sm-12">
+            <a href="{$fsc->url()}" class="btn btn-sm btn-default">
+               <span class="glyphicon glyphicon-remove"></span> &nbsp; Cancelar
+            </a>
+            <button type="button" class="btn btn-sm btn-primary pull-right" onclick="this.disabled = true; this.form.submit();">
+               <span class="glyphicon glyphicon-floppy-disk"></span> &nbsp; Guardar
+            </button>
+         </div>
+      </div>
+   </div>
+</form>
+
+{include="footer"}

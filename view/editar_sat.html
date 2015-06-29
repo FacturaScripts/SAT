@@ -1,0 +1,411 @@
+{include="header"}
+
+{if="$fsc->registro"}
+<script type="text/javascript">
+   $(document).ready(function () {
+      $("#b_eliminar").click(function(event) {
+         event.preventDefault();
+         if( confirm("¿Realmente desea eliminar este registro SAT?") )
+            window.location.href = 'index.php?page=listado_sat&delete={$fsc->registro->nsat}';
+      });
+   });
+</script>
+
+<form action="{$fsc->registro->url()}&id{$fsc->registro->nsat}" method="post" class="form">
+   <div class="container-fluid hidden-print" style="margin-top: 10px;">
+      <div class="row">
+         <div class="col-xs-8">
+            <a href="{$fsc->registro->url()&id{$fsc->registro->nsat}}" class="btn btn-sm btn-default" title="Recargar la página">
+               <span class="glyphicon glyphicon-refresh"></span>
+            </a>
+            <div class="btn-group">
+               <button type="button" class="btn btn-sm btn-default" onclick="window.print();">
+                  <span class="glyphicon glyphicon-print"></span>
+                  <span class="hidden-xs">&nbsp; Imprimir</span>
+               </button>
+               <a href="index.php?page=listado_sat&codcliente={$fsc->registro->codcliente}" class="btn btn-sm btn-default">
+                  <span class="glyphicon glyphicon-user"></span>
+                  <span class="hidden-xs">&nbsp; Más del cliente</span>
+               </a>
+               {loop="$fsc->extensions"}
+                  {if condition="$value->type=='button'"}
+                  <a href="index.php?page={$value->from}{$value->params}" class="btn btn-sm btn-default">{$value->text}</a>
+                  {/if}
+               {/loop}
+            </div>
+         </div>
+         <div class="col-xs-4 text-right">
+            <div class="btn-group">
+               {if="$fsc->allow_delete"}
+               <a id="b_eliminar" class="btn btn-sm btn-danger" href="#">
+                  <span class="glyphicon glyphicon-trash"></span>
+                  <span class="hidden-sm hidden-xs">&nbsp; Eliminar</span>
+               </a>
+               {/if}
+               <button type="submit" class="btn btn-sm btn-primary" onclick="this.disabled = true;this.form.submit();">
+                  <span class="glyphicon glyphicon-floppy-disk"></span>
+                  <span class="hidden-xs">&nbsp; Guardar</span>
+               </button>
+            </div>
+         </div>
+      </div>
+      <div class="row">
+         <div class="col-sm-12">
+            <h2 style="margin-bottom: 0px;">
+               <a href="index.php?page=listado_sat">SAT</a> /
+               <a href="{$fsc->registro->cliente_url()}">{$fsc->registro->nombre_cliente}</a> /
+               {$fsc->registro->nsat}
+            </h2>
+            <p>Fecha entrada: {$fsc->registro->fentrada}</p>
+         </div>
+      </div>
+      <div class="row">
+         <div class="col-sm-5">
+            <div class="form-group">
+               Nombre del cliente:
+               <input class="form-control" type="text" name="nombre" value="{$fsc->registro->nombre_cliente}" autocomplete="off"/>
+            </div>
+         </div>
+         <div class="col-sm-2">
+            <div class="form-group">
+               Teléfono fijo:
+               <input class="form-control" type="text" name="telefono1" value="{$fsc->registro->telefono1_cliente}" autocomplete="off"/>
+            </div>
+         </div>
+         <div class="col-sm-2">
+            <div class="form-group">
+               Teléfono móvil:
+               <input class="form-control" type="text" name="telefono2" value="{$fsc->registro->telefono2_cliente}" autocomplete="off"/>
+            </div>
+         </div>
+         <div class="col-sm-3">
+            <div class="form-group">
+               Persona de contacto:
+               <input class="form-control" type="text" name="contacto" value="{$fsc->registro->contacto}" autocomplete="off"/>
+            </div>
+         </div>
+      </div>
+   </div>
+   
+   <div class="hidden-print" role="tabpanel">
+      <ul class="nav nav-tabs" role="tablist">
+         <li{if="$fsc->mostrar=='home'"} class="active"{/if}>
+            <a href="{$fsc->url()}&id={$fsc->registro->nsat}&mostrar=home">
+                <span class="glyphicon glyphicon-list-altt" aria-hidden="true"></span>
+                <span class="hidden-xs">&nbsp; Datos generales</span>
+            </a>
+        </li>
+        <li{if="$fsc->mostrar=='detalles'"} class="active"{/if}>
+            <a href="{$fsc->url()}&id={$fsc->registro->nsat}&mostrar=detalles" title="Detalles">
+               <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
+               <span class="hidden-xs">&nbsp; Detalles</span>
+               <span class="hidden-sm badge">{$fsc->registro->num_detalles()}</span>
+            </a>
+        </li>
+      </ul>
+            <div class="tab-content">
+         <div role="tabpanel" class="tab-pane {if="$fsc->mostrar=='home'"}active{/if}" id="home">
+            <div class="container-fluid" style="margin-top: 10px;">
+               <div class="row">
+                  {if="$fsc->sat_setup['sat_col_modelo']"}
+                  <div class="col-sm-9">
+                     <div class="form-group">
+                        Modelo:
+                        <input class="form-control" type="text" name="modelo" value="{$fsc->registro->modelo}"/>
+                     </div>
+                  </div>
+                  {/if}
+                  {if="$fsc->sat_setup['sat_col_posicion']"}
+                  <div class="col-sm-3">
+                     <div class="form-group">
+                        {if="$fsc->registro->posicion==''"}
+                        <label STYLE="color:red">Ubicación sin asignar</label>
+                        {else}
+                        <label>Ubicación:</label>
+                        {/if}
+                        <input class="form-control" type="text" name="posicion" value="{$fsc->registro->posicion}" placeholder="ubiciación del producto en el almacén"/>
+                     </div>
+                  </div>
+                  {/if}
+               </div>
+               <div class="row">
+                  <div class="{if="$fsc->sat_setup['sat_col_accesorios']"}col-sm-6{else}col-sm-12{/if}">
+                     <div class="form-group">
+                        Avería:
+                        <textarea class="form-control" name="averia" rows="5">{$fsc->registro->averia}</textarea>
+                     </div>
+                  </div>
+                  {if="$fsc->sat_setup['sat_col_accesorios']"}
+                  <div class="col-sm-6">
+                     <div class="form-group">
+                        Accesorios:
+                        <textarea class="form-control" name="accesorios" rows="5">{$fsc->registro->accesorios}</textarea>
+                     </div>
+                  </div>
+                  {/if}
+               </div>
+               <div class="row">
+                  {if="$fsc->sat_setup['sat_col_prioridad']"}
+                  <div class="col-sm-2">
+                     <div class="form-group">
+                        Prioridad:
+                        <select name="prioridad" class="form-control">
+                        {loop="fsc->listar_prioridad()"}
+                           {if="$value['id_prioridad'] == $fsc->registro->prioridad"}
+                           <option value="{$value['id_prioridad']}" selected>{$value['nombre_prioridad']}</option>
+                           {else}
+                           <option value="{$value['id_prioridad']}">{$value['nombre_prioridad']}</option>
+                           {/if}
+                        {/loop}
+                        </select>
+                     </div>
+                  </div>
+                  {/if}
+                  <div class="col-sm-3">
+                     <div class="form-group">
+                        Estado:
+                        <select name="estado" class="form-control" style="background-color: #{$fsc->registro->color_estado()};">
+                        {loop="fsc->estado->all()"}
+                           {if="$value->id == $fsc->registro->estado"}
+                           <option value="{$value->id}" selected>{$value->descripcion}</option>
+                           {else}
+                           <option value="{$value->id}">{$value->descripcion}</option>
+                           {/if}
+                        {/loop}
+                        </select>
+                     </div>
+                  </div>
+                  {if="$fsc->sat_setup['sat_col_fecha']"}
+                  <div class="col-sm-2">
+                     <div class="form-group">
+                        Fecha:
+                        <input class="form-control datepicker" type="text" name="fecha" value="{$fsc->registro->fentrada}" autocomplete="off"/>
+                     </div>
+                  </div>
+                  {/if}
+                  {if="$fsc->sat_setup['sat_col_fechaini']"}
+                  <div class="col-sm-2">
+                     <div class="form-group">
+                        Fecha inicio:
+                        <input class="form-control datepicker" type="text" name="fcomienzo" value="{$fsc->registro->fcomienzo}" autocomplete="off"/>
+                     </div>
+                  </div>
+                  {/if}
+                  {if="$fsc->sat_setup['sat_col_fechafin']"}
+                  <div class="col-sm-2">
+                     <div class="form-group">
+                        Fecha finalización:
+                        <input class="form-control datepicker" type="text" name="ffin" value="{$fsc->registro->ffin}" autocomplete="off"/>
+                     </div>
+                  </div>
+                  {/if}
+                  <div class="col-sm-3">
+                     <div class="form-group">
+                        Empleado asignado:
+                        <select name="codagente" class="form-control">
+                           <option value="">Ninguno</option>
+                           <option value="">------</option>
+                           {loop="$fsc->listado_agentes()"}
+                              {if="$fsc->registro->codagente==$value->codagente"}
+                              <option value="{$value->codagente}" selected="selected">{$value->get_fullname()}</option>
+                              {else}
+                              <option value="{$value->codagente}">{$value->get_fullname()}</option>
+                              {/if}
+                           {/loop}
+                        </select>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div role="tabpanel" class="tab-pane {if="$fsc->mostrar=='detalles'"}active{/if}" id="detalles">
+            <div class="table-responsive">
+               <table class="table table-hover">
+                  <thead>
+                     <tr>
+                        <th class="text-left">Usuario</th>
+                        <th class="text-left">Detalle</th>
+                        <th class="text-right">Fecha</th>
+                     </tr>
+                  </thead>
+                  {loop="fsc->listar_sat_detalle()"}
+                  <tr>
+                     <td>{$value->nick}</td>
+                     <td>{$value->descripcion}</td>
+                     <td class="text-right">{$value->fecha}</td>
+                  </tr>
+                  {/loop}
+                  <tr>
+                     <td colspan="3">
+                        <a href='#' class="btn btn-info btn-block btn-sm" data-toggle="modal" data-target="#modal_nuevo_detalle">
+                           Nuevo detalle
+                        </a>
+                     </td>
+                  </tr>
+               </table>
+            </div>
+            
+            <div class="form-group" style="padding: 10px;">
+               Observaciones:
+               <textarea class="form-control" name="observaciones" rows="9">{$fsc->registro->observaciones}</textarea>
+            </div>
+         </div>
+      </div>
+   </div>
+</form>
+
+<div class="visible-print">
+   <div class="col-xs-6">
+      <div class="col-xs-12">
+         <strong>Nombre:</strong><br/>
+         {$fsc->registro->nombre_cliente}
+      </div>
+      <div class="col-xs-6">
+         <strong>Teléfono fijo:</strong><br/>
+         {$fsc->registro->telefono1_cliente}
+      </div>
+      <div class="col-xs-6">
+         <strong>Teléfono móvil:</strong><br/>
+         {$fsc->registro->telefono2_cliente}
+      </div>
+      <div class="col-xs-12">
+         <strong>Modelo:</strong><br/>
+         {$fsc->registro->modelo}
+      </div>
+      <div class="col-xs-12">
+         <strong>Averia:</strong><br/>
+         {$fsc->registro->averia}
+      </div>
+      <div class="col-xs-12">
+         <strong>Accesorios:</strong><br/>
+         {$fsc->registro->accesorios}
+      </div>
+      <div class="col-xs-12">
+         <strong>Observaciones:</strong><br/>
+         {$fsc->registro->observaciones}
+      </div>
+   </div>
+   <div class="col-xs-6">
+      <h4><strong>Numero de SAT: {$fsc->registro->nsat}</strong><br/></h4>
+      <p>Condiciondes del deposito:<br/>
+         Los presupuestos realizados tienen una<br/>
+         validez de 15 dias<br/>
+         Una vez avisado al cliente para que recoja
+         el producto este dispondrá de un plazo maximo de
+         2 meses para recogerlo, de no ser así y no
+         haber aviso por parte del cliente se empezará a
+         cobrar 1 euro al dia por gasto de almacenaje.<br/>
+         Los accesorios y productos externos al equipo 
+         no especificados en este documento no podran ser
+         reclamados en caso de disconformidad con el tecnico.
+      </p>
+      <h4>
+         Servicio prestado por: {$fsc->empresa->nombre}<br/>
+         {if="$fsc->agente"}
+         Le a atendido el tecnico: <strong>{$fsc->agente->get_fullname()}</strong><br/>
+         {/if}
+         Tlf: <strong>{$fsc->empresa->telefono}</strong> Email: <strong>{$fsc->empresa->email}</strong><br/>
+      </h4>
+   </div>
+   <p>...............................................................................................................................................................................................</p>
+   <div class="col-xs-6">
+      <div class="col-xs-6">
+         <h4><strong>Numero de SAT: {$fsc->registro->nsat}</strong><br/></h4>
+      </div>
+      <div class="col-xs-6">
+         <h4><strong>Prioridad</strong><br/>
+            {loop="fsc->listar_prioridad()"}
+            {if="$value['id_prioridad'] == $fsc->registro->prioridad"}
+            {$value['nombre_prioridad']}
+            {/if}
+            {/loop}
+         </h4>
+      </div>
+      <div class="col-xs-6">
+         <h4><strong>Comienzo:</strong><br/>
+            {$fsc->registro->fcomienzo}</h4>
+      </div>
+      <div class="col-xs-6">
+         <h4><strong>Final:</strong><br/>
+            {$fsc->registro->ffin}</h4>
+      </div>
+      <div class="col-xs-12">
+         <strong>Nombre:</strong><br/>
+         {$fsc->registro->nombre_cliente}
+      </div>
+      <div class="col-xs-6">
+         <strong>Teléfono fijo:</strong><br/>
+         {$fsc->registro->telefono1_cliente}
+      </div>
+      <div class="col-xs-6">
+         <strong>Teléfono móvil:</strong><br/>
+         {$fsc->registro->telefono2_cliente}
+      </div>
+      <div class="col-xs-12">
+         <strong>Modelo:</strong><br/>
+         {$fsc->registro->modelo}
+      </div>
+      <div class="col-xs-12">
+         <strong>Averia:</strong><br/>
+         {$fsc->registro->averia}
+      </div>
+      <div class="col-xs-12">
+         <strong>Accesorios:</strong><br/>
+         {$fsc->registro->accesorios}
+      </div>
+      <div class="col-xs-12">
+         <strong>Observaciones:</strong><br/>
+         {$fsc->registro->observaciones}
+      </div>
+   </div>
+
+   <div class="col-xs-6">
+      <br/>
+      Notas:
+      <br/>  
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+   </div>
+</div>
+
+<div class="modal fade" id="modal_nuevo_detalle">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <form name="f_nuevo_cliente" action="{$fsc->registro->url()}#detalles" method="post" class="form">
+            <div class="modal-header">
+               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+               <h4 class="modal-title">Nuevo detalle</h4>
+            </div>
+            <div class="modal-body">
+               <textarea class="form-control" name="detalle" rows="5" autofocus></textarea>
+            </div>
+            <div class="modal-footer">
+               <button class="btn btn-sm btn-primary" type="submit" onclick="this.disabled = true; this.form.submit();">
+                  <span class="glyphicon glyphicon-floppy-disk"></span> &nbsp; Guardar
+               </button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+{else}
+<div class="thumbnail">
+   <img src="view/img/fuuu_face.png" alt="fuuuuu"/>
+</div>
+{/if}
+
+{include="footer"}
