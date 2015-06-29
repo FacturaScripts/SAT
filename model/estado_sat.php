@@ -38,7 +38,7 @@ class estado_sat extends fs_model
          $this->id = $this->intval($e['id']);
          $this->descripcion = $e['descripcion'];
          $this->color = $e['color'];
-         $this->activo= $e['activo'];
+         $this->activo= $this->str2bool($e['activo']);
       }
       else
       {
