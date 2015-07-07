@@ -61,7 +61,7 @@
          </div>
          <div class="col-sm-6 text-right">
             {if condition="isset($_GET['codcliente'])"}
-            <h2 style="margin-top: 0px;">Registros del cliente {$_GET['codcliente']}</h2>
+            <h2 style="margin-top: 0px;">Resultados del cliente {$_GET['codcliente']}</h2>
             {else}
             <h2 style="margin-top: 0px;">SAT</h2>
             {/if}
@@ -93,6 +93,7 @@
                <select name="estado" class="form-control" onchange="this.form.submit();">
                   <option value="activos" {if="$fsc->busqueda['estado']=='activos'"} selected{/if}>Activos</option>
                   <option value="todos"{if="$fsc->busqueda['estado']=='todos'"} selected{/if}>Todos</option>
+                  <option value="">------</option>
                   {loop="fsc->estado->all()"}
                   <option value="{$value->id}"{if="$fsc->busqueda['estado']==$value->id"} selected{/if}>{$value->descripcion}</option>
                   {/loop}
@@ -102,15 +103,17 @@
          <div class="col-sm-2">
             <div class="form-group">
                <select name="orden" class="form-control" onchange="this.form.submit();">
-                  <option value="nsat"{if="$fsc->busqueda['orden']=='nsat'"} selected{/if}>Orden: Nº de sat</option>
-                  <option value="fentrada"{if="$fsc->busqueda['orden']=='fentrada'"} selected{/if}>Fecha</option>
+                  <option value="nsat"{if="$fsc->busqueda['orden']=='nsat'"} selected{/if}>Orden: Nº sat</option>
+                  <option value="nsat2"{if="$fsc->busqueda['orden']=='nsat2'"} selected{/if}>Orden: Nº sat (inverso)</option>
+                  <option value="fentrada"{if="$fsc->busqueda['orden']=='fentrada'"} selected{/if}>Orden: fecha</option>
+                  <option value="fentrada2"{if="$fsc->busqueda['orden']=='fentrada2'"} selected{/if}>Orden: fecha (inverso)</option>
                   {if="$fsc->sat_setup['sat_col_fechaini']"}
-                  <option value="fcomienzo"{if="$fsc->busqueda['orden']=='fcomienzo'"} selected{/if}>Fecha de comienzo</option>
+                  <option value="fcomienzo"{if="$fsc->busqueda['orden']=='fcomienzo'"} selected{/if}>Orden: fecha comienzo</option>
                   {/if}
                   {if="$fsc->sat_setup['sat_col_fechafin']"}
-                  <option value="ffin"{if="$fsc->busqueda['orden']=='ffin'"} selected{/if}>Fecha de finalizacion</option>
+                  <option value="ffin"{if="$fsc->busqueda['orden']=='ffin'"} selected{/if}>Orden: fecha finalización</option>
                   {/if}
-                  <option value="prioridad"{if="$fsc->busqueda['orden']=='prioridad'"} selected{/if}>Prioridad</option>
+                  <option value="prioridad"{if="$fsc->busqueda['orden']=='prioridad'"} selected{/if}>Orden: prioridad</option>
                </select>
             </div>
          </div>
@@ -125,17 +128,13 @@
          <span class="hidden-xs">&nbsp; Resultados</span>
       </a>
    </li>
+   {if="$fsc->sat_setup['maps_api_key']"}
    <li{if="$fsc->mostrar=='mapa'"} class="active"{/if}>
       <a href="{$fsc->url()}&mostrar=mapa" title="Mapa">
          <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
       </a>
    </li>
-   <li{if="$fsc->mostrar=='opciones'"} class="active"{/if}>
-      <a href="{$fsc->url()}&mostrar=opciones">
-         <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
-         <span class="hidden-xs">&nbsp; Opciones</span>
-      </a>
-   </li>
+   {/if}
 </ul>
 
 {if="$fsc->mostrar=='resultados'"}
@@ -193,10 +192,8 @@
    </li>
    {/if}
 </ul>
-{elseif="$fsc->mostrar=='mapa'"}
-
-{if="$fsc->maps_api_key"}
-<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key={$fsc->maps_api_key}&sensor=TRUE"></script>
+{elseif="$fsc->mostrar=='mapa' AND $fsc->sat_setup['maps_api_key']"}
+<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key={$fsc->sat_setup['maps_api_key']}&sensor=TRUE"></script>
 <script type="text/javascript">
    var map;
    function initialize2() {
@@ -207,22 +204,24 @@
       map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
       geocoder = new google.maps.Geocoder();
       {loop="$fsc->resultado"}
-      geocoder.geocode( { 'address': '{$value->direccion_cliente()}' }, function(results, status) {
-         if (status == google.maps.GeocoderStatus.OK) {
-            var marker = new google.maps.Marker({
-               map: map,
-               position: results[0].geometry.location,
-               title: "#{$value->nsat} {$value->nombre_cliente}\ntlf1: {$value->telefono1_cliente} tlf2: {$value->telefono2_cliente}\n",
-               url: '{$value->url()}',
-               icon: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|{$value->color_estado()}'
-            });
-            google.maps.event.addListener(marker, 'click', function() {
-               window.location.href = this.url;
-            });
-         } else {
-            alert('Geocode was not successful for the following reason: ' + status);
-         }
-      });
+         {if="$counter<20"}
+         geocoder.geocode( { 'address': '{$value->direccion_cliente()}' }, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+               var marker = new google.maps.Marker({
+                  map: map,
+                  position: results[0].geometry.location,
+                  title: "#{$value->nsat} {$value->nombre_cliente}\ntlf1: {$value->telefono1_cliente} tlf2: {$value->telefono2_cliente}\n",
+                  url: '{$value->url()}',
+                  icon: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|{$value->color_estado()}'
+               });
+               google.maps.event.addListener(marker, 'click', function() {
+                  window.location.href = this.url;
+               });
+            } else {
+               alert('Geocode was not successful for the following reason: ' + status);
+            }
+         });
+         {/if}
       {/loop}
       if(navigator.geolocation) {
          navigator.geolocation.getCurrentPosition(function (position) {
@@ -247,216 +246,6 @@
       </button>
    </div>
 </form>
-{else}
-<form action="{$fsc->url()}" method="post" class="form">
-   <div id="map-api-form" class="container-fluid" style="margin-top: 10px;">
-      <div class="row">
-         <div class="col-md-6">
-            <h2>Tienes que asignar una clave de API de google maps:</h2>
-            <ul>
-               <li>Accede a esta web: <a href="//code.google.com/apis/console" target="_blank">https://code.google.com/apis/console</a></li>
-               <li>Ve a APIs y autenticación &gt; APIs. Busca <b>Google Maps JavaScript API v3</b> y actívala.</li>
-               <li>Ve a APIs y autenticación &gt; Credenciales &gt; Acceso a API pública y pulsa el botón <b>Crear clave nueva</b>.</li>
-            </ul>
-         </div>
-         <div class="col-md-6">
-            <div class="form-group">
-               Clave de la API:
-               <input type="text" name="maps_api_key" placeholder="Clave de la API" class="form-control" autocomplete="off"/>
-            </div>
-            <button class="btn btn-sm btn-primary" type="submit" onclick="this.disabled=true; this.form.submit();">
-               <span class="glyphicon glyphicon-floppy-disk"></span> &nbsp; Guardar
-            </button>
-         </div>
-      </div>
-   </div>
-</form>
-{/if}
-
-{else}
-<script type="text/javascript" src="plugins/SAT/view/jscolor/jscolor.js"></script>
-
-<form action="{$fsc->url()}" method="post" class="form">
-   <input type="hidden" name="sat_setup" value="TRUE"/>
-   <div class="container-fluid" style="margin-top: 10px;">
-      <div class="row">
-         <div class="col-sm-3">
-            <div class="checkbox">
-               <label>
-                  <input type="checkbox" name="col_modelo" value="TRUE"{if="$fsc->sat_setup['sat_col_modelo']"} checked="checked"{/if}/>
-                  Usar columna <b>modelo</b>.
-               </label>
-            </div>
-         </div>
-         <div class="col-sm-3">
-            <div class="checkbox">
-               <label>
-                  <input type="checkbox" name="col_posicion" value="TRUE"{if="$fsc->sat_setup['sat_col_posicion']"} checked="checked"{/if}/>
-                  Usar columna <b>ubicación</b>.
-               </label>
-            </div>
-         </div>
-         <div class="col-sm-3">
-            <div class="checkbox">
-               <label>
-                  <input type="checkbox" name="col_accesorios" value="TRUE"{if="$fsc->sat_setup['sat_col_accesorios']"} checked="checked"{/if}/>
-                  Usar columna <b>accesorios</b>.
-               </label>
-            </div>
-         </div>
-         <div class="col-sm-3">
-            <div class="checkbox">
-               <label>
-                  <input type="checkbox" name="col_prioridad" value="TRUE"{if="$fsc->sat_setup['sat_col_prioridad']"} checked="checked"{/if}/>
-                  Usar columna <b>prioridad</b>.
-               </label>
-            </div>
-         </div>
-         <div class="col-sm-3">
-            <div class="checkbox">
-               <label>
-                  <input type="checkbox" name="col_fecha" value="TRUE"{if="$fsc->sat_setup['sat_col_fecha']"} checked="checked"{/if}/>
-                  Usar columna <b>fecha</b>.
-               </label>
-            </div>
-         </div>
-         <div class="col-sm-3">
-            <div class="checkbox">
-               <label>
-                  <input type="checkbox" name="col_fechaini" value="TRUE"{if="$fsc->sat_setup['sat_col_fechaini']"} checked="checked"{/if}/>
-                  Usar columna <b>fecha de inicio</b>.
-               </label>
-            </div>
-         </div>
-         <div class="col-sm-3">
-            <div class="checkbox">
-               <label>
-                  <input type="checkbox" name="col_fechafin" value="TRUE"{if="$fsc->sat_setup['sat_col_fechafin']"} checked="checked"{/if}/>
-                  Usar columna <b>fecha finalización</b>.
-               </label>
-            </div>
-         </div>
-         <div class="col-sm-3 text-right">
-            <button class="btn btn-sm btn-primary" type="submit" onclick="this.disabled=true; this.form.submit();">
-               <span class="glyphicon glyphicon-floppy-disk"></span> &nbsp; Guardar
-            </button>
-         </div>
-      </div>
-   </div>
-</form>
-<br/>
-<div class="table-responsive">
-   <table class="table">
-      <thead>
-         <tr>
-            <th class="text-left">Estado</th>
-            <th class="text-left">Descripción</th>
-            <th class="text-left">Color</th>
-            <th class="text-left">¿Listado de activos?</th>
-            <th class="text-right">Acciones</th>
-         </tr>
-      </thead>
-      {loop="$fsc->estado->all()"}
-      <form action="{$fsc->url()}" method="post" class="form">
-         <input type="hidden" name="id_estado" value="{$value->id}"/>
-         <tr>
-            <td><div class="form-control">{$value->id}</div></td>
-            <td>
-               <input type="text" name="descripcion" value="{$value->descripcion}" class="form-control" autocomplete="off"/>
-            </td>
-            <td>
-               <input type="text" name="color" value="{$value->color}" class="form-control color" autocomplete="off" maxlength="6"/>
-            </td>
-            {if="$value->activo==0"}
-            <td>
-                <div class="checkbox">
-                    <label>
-                        Si
-                        <input type="radio" name="activo" value=1 >
-                    </label>
-                    <label>
-                        No
-                        <input type="radio" name="activo" value=0 checked>        
-                    </label>
-                </div>
-            </td>
-            {else}
-            <td>
-                <div class="checkbox">
-                    <label>
-                        Si
-                        <input type="radio" name="activo" value=1 checked>
-                    </label>
-                    <label>
-                        No
-                        <input type="radio" name="activo" value=0 >        
-                    </label>
-                </div>
-            </td>
-            {/if}
-            
-            <td class="text-right">
-               <div class="btn-group">
-                  {if="$fsc->allow_delete"}
-                  <a class="btn btn-sm btn-danger" href="#" onclick="eliminar_estado('{$value->id}')" title="Eliminar">
-                     <span class="glyphicon glyphicon-trash"></span>
-                  </a>
-                  {/if}
-                  <button type="submit" class="btn btn-sm btn-primary" onclick="this.disabled = true;this.form.submit();" title="Guardar">
-                     <span class="glyphicon glyphicon-floppy-disk"></span>
-                  </button>
-               </div>
-            </td>
-         </tr>
-      </form>
-      {/loop}
-      <form action="{$fsc->url()}" method="post" class="form">
-         <tr class="bg-info">
-            <td>
-               <input type="text" name="id_estado" value="{$fsc->estado->get_nuevo_id()}" class="form-control" autocomplete="off"/>
-            </td>
-            <td>
-               <input type="text" name="descripcion" value="" class="form-control" autocomplete="off"/>
-            </td>
-            <td>
-               <input type="text" name="color" value="FFFFFF" class="form-control color" autocomplete="off" maxlength="6"/>
-            </td>
-            <td>
-                <div class="checkbox">
-                    <label>
-                        Si
-                        <input type="radio" name="activo" value=true checked>
-                    </label>
-                    <label>
-                        No
-                        <input type="radio" name="activo" value=false >        
-                    </label>
-                </div>
-            </td>
-            <td class="text-right">
-               <div class="btn-group">
-                  <button type="submit" class="btn btn-sm btn-primary" onclick="this.disabled = true;this.form.submit();" title="Guardar">
-                     <span class="glyphicon glyphicon-floppy-disk"></span>
-                  </button>
-               </div>
-            </td>
-         </tr>
-      </form>
-   </table>
-</div>
-<div class="container-fluid">
-   <div class="row">
-      <div class="col-sm-12">
-         <div class="page-header">
-            <h1>¿Necesitas más opciones o características?</h1>
-         </div>
-         <p>
-            Pues no seas tímido, <a href="https://www.facturascripts.com/store/producto/1h-de-desarrollo/" target="_blank">compra 1h de desarrollo</a>
-            y dime a qué quieres que la dedique ;-)
-         </p>
-      </div>
-   </div>
-</div>
 {/if}
 
 <div class="modal" id="modal_nuevo_sat">

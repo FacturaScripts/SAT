@@ -56,33 +56,29 @@ class editar_sat extends fs_controller
       /// cargamos la configuración
       $fsvar = new fs_var();
       $this->sat_setup = $fsvar->array_get(
-              array(
-                  'sat_modificado' => FALSE,
-                  'sat_col_modelo' => FALSE,
-                  'sat_col_posicion' => FALSE,
-                  'sat_col_accesorios' => FALSE,
-                  'sat_col_prioridad' => FALSE,
-                  'sat_col_fecha' => FALSE,
-                  'sat_col_fechaini' => FALSE,
-                  'sat_col_fechafin' => FALSE
-              )
+         array(
+             'sat_col_modelo' => 0,
+             'sat_col_posicion' => 0,
+             'sat_col_accesorios' => 0,
+             'sat_col_prioridad' => 0,
+             'sat_col_fecha' => 1,
+             'sat_col_fechaini' => 0,
+             'sat_col_fechafin' => 0,
+             'maps_api_key' => 0
+         ),
+         FALSE
       );
-      if( !$this->sat_setup['sat_modificado'] )
-      {
-         $this->sat_setup['sat_col_prioridad'] = TRUE;
-         $this->sat_setup['sat_col_fechaini'] = TRUE;
-         $this->sat_setup['sat_col_fechafin'] = TRUE;
-      }
+      
       /// ¿Qué pestaña hay que mostrar?
       $this->mostrar = 'home';
       if( isset($_REQUEST['mostrar']) )
       {
          $this->mostrar = $_REQUEST['mostrar'];
-         setcookie('sat_mostrar', $this->mostrar, time()+FS_COOKIES_EXPIRE);
+         setcookie('editsat_mostrar', $this->mostrar, time()+FS_COOKIES_EXPIRE);
       }
-      else if( isset($_COOKIE['sat_mostrar']) )
+      else if( isset($_COOKIE['editsat_mostrar']) )
       {
-         $this->mostrar = $_COOKIE['sat_mostrar'];
+         $this->mostrar = $_COOKIE['editsat_mostrar'];
       } 
       
       $this->registro = FALSE;

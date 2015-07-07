@@ -1,8 +1,8 @@
 <?php
 /*
  * This file is part of FacturaSctipts
- * Copyright (C) 2014      Francisco Javier Trujillo   javier.trujillo.jimenez@gmail.com
- * Copyright (C) 2014-2015 Carlos Garcia Gomez         neorazorx@gmail.com
+ * Copyright (C) 2014-2015    Francisco Javier Trujillo   javier.trujillo.jimenez@gmail.com
+ * Copyright (C) 2014-2015    Carlos Garcia Gomez         neorazorx@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -395,25 +395,49 @@ class registro_sat extends fs_model
          $sql .= " AND fcomienzo <= ".$this->var2str($hasta);
       }
       
-      if($estado != '')
+      if($estado == '')
       {
-          if($estado=='activos')
-          {
-              $sql .= " AND e.activo = 1"; 
-          }
-          elseif($estado!="todos")
-          {
-             $sql .= " AND r.estado = ".$this->var2str($estado); 
-          }
          
       }
-      
-      if($orden == 'prioridad')
+      else if($estado == 'activos')
       {
-         $sql.= " ORDER BY prioridad ASC, fcomienzo ASC";
+         $sql .= " AND e.activo"; 
       }
-      else
-         $sql.= " ORDER BY ".$orden." DESC, prioridad ASC";
+      elseif($estado != "todos")
+      {
+         $sql .= " AND r.estado = ".$this->var2str($estado); 
+      }
+      
+      switch($orden)
+      {
+         case 'nsat':
+            $sql.= " ORDER BY nsat DESC, prioridad ASC";
+            break;
+         
+         case 'nsat2':
+            $sql.= " ORDER BY nsat ASC, prioridad ASC";
+            break;
+         
+         case 'fentrada':
+            $sql.= " ORDER BY fentrada DESC, prioridad ASC";
+            break;
+         
+         case 'fentrada2':
+            $sql.= " ORDER BY fentrada ASC, prioridad ASC";
+            break;
+         
+         case 'fcomienzo':
+            $sql.= " ORDER BY fcomienzo ASC, prioridad ASC";
+            break;
+         
+         case 'ffin':
+            $sql.= " ORDER BY ffin ASC, prioridad ASC";
+            break;
+         
+         default:
+            $sql.= " ORDER BY prioridad ASC, fcomienzo ASC";
+            break;
+      }
       
       $data = $this->db->select_limit($sql, FS_ITEM_LIMIT, $offset);
       if($data)

@@ -51,7 +51,9 @@ class estado_sat extends fs_model
    
    protected function install()
    {
-      return "INSERT INTO estados_sat (id,descripcion,activo,color) VALUES ('1','Nuevo',TRUE,'D9EDF7'),('2','Terminado',FALSE,'DFF0D8');";
+      return "INSERT INTO estados_sat (id,descripcion,activo,color) VALUES".
+              " ('1','Nuevo',TRUE,'D9EDF7')".
+              ",('2','Terminado',FALSE,'DFF0D8');";
    }
    
    public function get($id)
@@ -94,15 +96,16 @@ class estado_sat extends fs_model
       if( $this->exists() )
       {
          $sql = "UPDATE estados_sat SET descripcion = ".$this->var2str($this->descripcion).
-                 ", activo = ".$this->activo.
-                 ", color = ".$this->var2str($this->color)." WHERE id = ".$this->var2str($this->id).";";
+                 ", activo = ".$this->var2str($this->activo).
+                 ", color = ".$this->var2str($this->color).
+                 "  WHERE id = ".$this->var2str($this->id).";";
       }
       else
       {
          $sql = "INSERT INTO estados_sat (id,descripcion,activo,color) VALUES ("
                  .$this->var2str($this->id).","
                  .$this->var2str($this->descripcion).","
-                 .$this->activo.","
+                 .$this->var2str($this->activo).","
                  .$this->var2str($this->color).");";
       }
       

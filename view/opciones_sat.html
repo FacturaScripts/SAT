@@ -1,0 +1,201 @@
+{include="header"}
+
+<br/>
+
+<div class="container">
+   <div class="row">
+      <div class="col-sm-4">
+         <a href="{$fsc->url()}" class="btn btn-sm btn-default" title="Recargar la página">
+            <span class="glyphicon glyphicon-refresh"></span>
+         </a>
+         <a href="index.php?page=listado_sat" class="btn btn-sm btn-default">
+            <span class="glyphicon glyphicon-arrow-left"></span> &nbsp; Atrás
+         </a>
+      </div>
+      <div class="col-sm-8 text-right">
+         <h2 style="margin-top: 0px;">Opciones</h2>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-sm-12">
+         <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+               <a href="#general" aria-controls="general" role="tab" data-toggle="tab">
+                  General
+               </a>
+            </li>
+            <li role="presentation">
+               <a href="#estados" aria-controls="estados" role="tab" data-toggle="tab">
+                  Estados
+               </a>
+            </li>
+            <li role="presentation">
+               <a href="#mapa" aria-controls="mapa" role="tab" data-toggle="tab">
+                  <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> &nbsp; Mapa
+               </a>
+            </li>
+         </ul>
+      </div>
+   </div>
+   <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="general">
+         <br/>
+         <form action="{$fsc->url()}" method="post" class="form">
+            <input type="hidden" name="sat_setup" value="TRUE"/>
+            <div class="row">
+               <div class="col-sm-3">
+                  <div class="checkbox">
+                     <label>
+                        <input type="checkbox" name="col_modelo" value="TRUE"{if="$fsc->sat_setup['sat_col_modelo']"} checked="checked"{/if}/>
+                        Usar columna <b>modelo</b>.
+                     </label>
+                  </div>
+               </div>
+               <div class="col-sm-3">
+                  <div class="checkbox">
+                     <label>
+                        <input type="checkbox" name="col_posicion" value="TRUE"{if="$fsc->sat_setup['sat_col_posicion']"} checked="checked"{/if}/>
+                        Usar columna <b>ubicación</b>.
+                     </label>
+                  </div>
+               </div>
+               <div class="col-sm-3">
+                  <div class="checkbox">
+                     <label>
+                        <input type="checkbox" name="col_accesorios" value="TRUE"{if="$fsc->sat_setup['sat_col_accesorios']"} checked="checked"{/if}/>
+                        Usar columna <b>accesorios</b>.
+                     </label>
+                  </div>
+               </div>
+               <div class="col-sm-3">
+                  <div class="checkbox">
+                     <label>
+                        <input type="checkbox" name="col_prioridad" value="TRUE"{if="$fsc->sat_setup['sat_col_prioridad']"} checked="checked"{/if}/>
+                        Usar columna <b>prioridad</b>.
+                     </label>
+                  </div>
+               </div>
+               <div class="col-sm-3">
+                  <div class="checkbox">
+                     <label>
+                        <input type="checkbox" name="col_fecha" value="TRUE"{if="$fsc->sat_setup['sat_col_fecha']"} checked="checked"{/if}/>
+                        Usar columna <b>fecha</b>.
+                     </label>
+                  </div>
+               </div>
+               <div class="col-sm-3">
+                  <div class="checkbox">
+                     <label>
+                        <input type="checkbox" name="col_fechaini" value="TRUE"{if="$fsc->sat_setup['sat_col_fechaini']"} checked="checked"{/if}/>
+                        Usar columna <b>fecha de inicio</b>.
+                     </label>
+                  </div>
+               </div>
+               <div class="col-sm-3">
+                  <div class="checkbox">
+                     <label>
+                        <input type="checkbox" name="col_fechafin" value="TRUE"{if="$fsc->sat_setup['sat_col_fechafin']"} checked="checked"{/if}/>
+                        Usar columna <b>fecha finalización</b>.
+                     </label>
+                  </div>
+               </div>
+            </div>
+            <div class="row">
+               <div class="col-sm-12 text-right">
+                  <button class="btn btn-sm btn-primary" type="submit" onclick="this.disabled=true; this.form.submit();">
+                     <span class="glyphicon glyphicon-floppy-disk"></span> &nbsp; Guardar
+                  </button>
+               </div>
+            </div>
+         </form>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="estados">
+         <div class="table-responsive">
+            <table class="table">
+               <thead>
+                  <tr>
+                     <th class="text-left">Estado</th>
+                     <th class="text-left">Descripción</th>
+                     <th class="text-left">Color</th>
+                     <th class="text-center">¿Activo?</th>
+                     <th class="text-right">Acciones</th>
+                  </tr>
+               </thead>
+               {loop="$fsc->estado->all()"}
+               <form action="{$fsc->url()}" method="post" class="form">
+                  <input type="hidden" name="id_estado" value="{$value->id}"/>
+                  <tr>
+                     <td><div class="form-control">{$value->id}</div></td>
+                     <td><input type="text" name="descripcion" value="{$value->descripcion}" class="form-control" autocomplete="off"/></td>
+                     <td><input type="text" name="color" value="{$value->color}" class="form-control color" autocomplete="off" maxlength="6"/></td>
+                     <td class="text-center">
+                        <div class="checkbox">
+                           <label>
+                              <input type="checkbox" name="activo" value="TRUE"{if="$value->activo"} checked="checked"{/if}>
+                           </label>
+                        </div>
+                     </td>
+                     <td class="text-right">
+                        <div class="btn-group">
+                           {if="$fsc->allow_delete"}
+                           <a class="btn btn-sm btn-danger" href="#" onclick="eliminar_estado('{$value->id}')" title="Eliminar">
+                              <span class="glyphicon glyphicon-trash"></span>
+                           </a>
+                           {/if}
+                           <button type="submit" class="btn btn-sm btn-primary" onclick="this.disabled = true;this.form.submit();" title="Guardar">
+                              <span class="glyphicon glyphicon-floppy-disk"></span>
+                           </button>
+                        </div>
+                     </td>
+                  </tr>
+               </form>
+               {/loop}
+               <form action="{$fsc->url()}" method="post" class="form">
+                  <tr class="bg-info">
+                     <td><input type="text" name="id_estado" value="{$fsc->estado->get_nuevo_id()}" class="form-control" autocomplete="off"/></td>
+                     <td><input type="text" name="descripcion" value="" class="form-control" autocomplete="off"/></td>
+                     <td><input type="text" name="color" value="FFFFFF" class="form-control color" autocomplete="off" maxlength="6"/></td>
+                     <td class="text-center">
+                        <div class="checkbox">
+                           <label>
+                              <input type="checkbox" name="activo" value="TRUE" checked="checked">
+                           </label>
+                        </div>
+                     </td>
+                     <td class="text-right">
+                        <div class="btn-group">
+                           <button type="submit" class="btn btn-sm btn-primary" onclick="this.disabled = true;this.form.submit();" title="Guardar">
+                              <span class="glyphicon glyphicon-floppy-disk"></span>
+                           </button>
+                        </div>
+                     </td>
+                  </tr>
+               </form>
+            </table>
+         </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="mapa">
+         <form action="{$fsc->url()}" method="post" class="form">
+            <div class="row">
+               <div class="col-sm-12">
+                  <h2>Tienes que asignar una clave de API de google maps:</h2>
+                  <ul>
+                     <li>Accede a esta web: <a href="//code.google.com/apis/console" target="_blank">https://code.google.com/apis/console</a></li>
+                     <li>Ve a APIs y autenticación &gt; APIs. Busca <b>Google Maps JavaScript API v3</b> y actívala.</li>
+                     <li>Ve a APIs y autenticación &gt; Credenciales &gt; Acceso a API pública y pulsa el botón <b>Crear clave nueva</b>.</li>
+                  </ul>
+                  <div class="form-group">
+                     Clave de la API:
+                     <input type="password" name="maps_api_key" value="{$fsc->maps_api_key}" class="form-control"/>
+                  </div>
+                  <button class="btn btn-sm btn-primary" type="submit" onclick="this.disabled=true; this.form.submit();">
+                     <span class="glyphicon glyphicon-floppy-disk"></span> &nbsp; Guardar
+                  </button>
+               </div>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+
+{include="footer"}

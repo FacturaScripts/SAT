@@ -22,6 +22,7 @@
    <columna>
       <nombre>activo</nombre>
       <tipo>boolean</tipo>
+      <defecto>true</defecto>
    </columna>
    <restriccion>
       <nombre>estados_sat_pkey</nombre>

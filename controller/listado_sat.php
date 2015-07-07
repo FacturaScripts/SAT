@@ -2,7 +2,7 @@
 
 /*
  * This file is part of FacturaSctipts
- * Copyright (C) 2014         Francisco Javier Trujillo   javier.trujillo.jimenez@gmail.com
+ * Copyright (C) 2014-2015    Francisco Javier Trujillo   javier.trujillo.jimenez@gmail.com
  * Copyright (C) 2014-2015    Carlos Garcia Gomez         neorazorx@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,6 @@ class listado_sat extends fs_controller
    public $cliente;
    public $cliente_s;
    public $estado;
-   public $maps_api_key;
    public $mostrar;
    public $offset;
    public $pais;
@@ -53,7 +52,7 @@ class listado_sat extends fs_controller
    protected function private_core()
    {
       $this->agente = new agente();
-      $this->busqueda = array('desde' => '', 'hasta' => '', 'estado' => 'activos', 'orden' => 'nsat');
+      $this->busqueda = array('desde' => '', 'hasta' => '', 'estado' => 'activos', 'orden' => 'fentrada');
       $this->cliente = new cliente();
       $this->cliente_s = FALSE;
       $this->estado = new estado_sat();
@@ -63,52 +62,25 @@ class listado_sat extends fs_controller
       /// ¿El usuario tiene permiso para eliminar en esta página?
       $this->allow_delete = $this->user->allow_delete_on(__CLASS__);
       
-      /// leemos la API key de google maps de la base de datos o del formulario
-      $fsvar = new fs_var();
-      if( isset($_POST['maps_api_key']) )
-      {
-         $this->maps_api_key = $_POST['maps_api_key'];
-         $fsvar->simple_save('maps_api_key', $this->maps_api_key);
-      }
-      else
-         $this->maps_api_key = $fsvar->simple_get('maps_api_key');
-      
       /// cargamos la configuración
+      $fsvar = new fs_var();
       $this->sat_setup = $fsvar->array_get(
-              array(
-                  'sat_modificado' => FALSE,
-                  'sat_col_modelo' => FALSE,
-                  'sat_col_posicion' => FALSE,
-                  'sat_col_accesorios' => FALSE,
-                  'sat_col_prioridad' => FALSE,
-                  'sat_col_fecha' => FALSE,
-                  'sat_col_fechaini' => FALSE,
-                  'sat_col_fechafin' => FALSE
-              )
+         array(
+             'sat_col_modelo' => 0,
+             'sat_col_posicion' => 0,
+             'sat_col_accesorios' => 0,
+             'sat_col_prioridad' => 0,
+             'sat_col_fecha' => 1,
+             'sat_col_fechaini' => 0,
+             'sat_col_fechafin' => 0,
+             'maps_api_key' => 0
+         ),
+         FALSE
       );
-      if( isset($_POST['sat_setup']) )
+      
+      if(!$this->sat_setup['sat_col_fecha'])
       {
-         $this->sat_setup['sat_modificado'] = TRUE;
-         $this->sat_setup['sat_col_modelo'] = isset($_POST['col_modelo']);
-         $this->sat_setup['sat_col_posicion'] = isset($_POST['col_posicion']);
-         $this->sat_setup['sat_col_accesorios'] = isset($_POST['col_accesorios']);
-         $this->sat_setup['sat_col_prioridad'] = isset($_POST['col_prioridad']);
-         $this->sat_setup['sat_col_fecha'] = isset($_POST['col_fecha']);
-         $this->sat_setup['sat_col_fechaini'] = isset($_POST['col_fechaini']);
-         $this->sat_setup['sat_col_fechafin'] = isset($_POST['col_fechafin']);
-         
-         if( $fsvar->array_save($this->sat_setup) )
-         {
-            $this->new_message('Datos guardados correctamente.');
-         }
-         else
-            $this->new_error_msg('Error al guardar los datos.');
-      }
-      else if( !$this->sat_setup['sat_modificado'] )
-      {
-         $this->sat_setup['sat_col_prioridad'] = TRUE;
-         $this->sat_setup['sat_col_fechaini'] = TRUE;
-         $this->sat_setup['sat_col_fechafin'] = TRUE;
+         $this->busqueda['orden'] = 'nsat';
       }
       
       $this->offset = 0;
@@ -122,11 +94,11 @@ class listado_sat extends fs_controller
       if( isset($_REQUEST['mostrar']) )
       {
          $this->mostrar = $_REQUEST['mostrar'];
-         setcookie('editasat_mostrar', $this->mostrar, time()+FS_COOKIES_EXPIRE);
+         setcookie('sat_mostrar', $this->mostrar, time()+FS_COOKIES_EXPIRE);
       }
-      else if( isset($_COOKIE['editasat_mostrar']) )
+      else if( isset($_COOKIE['sat_mostrar']) )
       {
-         $this->mostrar = $_COOKIE['editasat_mostrar'];
+         $this->mostrar = $_COOKIE['sat_mostrar'];
       }
       
       
@@ -166,40 +138,6 @@ class listado_sat extends fs_controller
          
          $this->resultado = $this->registro_sat->all($this->offset);
       }
-      else if( isset($_GET['delete_estado']) )
-      {
-         $estado = $this->estado->get($_GET['delete_estado']);
-         if($estado)
-         {
-            if( $estado->delete() )
-            {
-               $this->new_message('Estado eliminado correctamente.');
-            }
-            else
-               $this->new_error_msg('Error al eliminar el estado.');
-         }
-         else
-            $this->new_error_msg('Estado no encontrado.');
-      }
-      else if( isset($_POST['id_estado']) )
-      {
-         $estado = $this->estado->get($_POST['id_estado']);
-         if(!$estado)
-         {
-            $estado = new estado_sat();
-            $estado->id = intval($_POST['id_estado']);
-         }
-         $estado->descripcion = $_POST['descripcion'];
-         $estado->color = $_POST['color'];
-         $estado->activo= $_POST['activo'];
-         
-         if( $estado->save() )
-         {
-            $this->new_message('Estado guardado correctamente.');
-         }
-         else
-            $this->new_error_msg('Error al guardar el estado.');
-      }
       else if( isset($_REQUEST['query']) )
       {
          /// esto es para una búsqueda
@@ -230,6 +168,7 @@ class listado_sat extends fs_controller
          {
             $this->ejemplos();
          }
+         
          $this->resultado = $this->registro_sat->search(
                  $this->query,
                  $this->busqueda['desde'],
@@ -425,7 +364,7 @@ class listado_sat extends fs_controller
          
          $sat->averia = $this->random_string();
          $sat->prioridad = mt_rand(1, 4);
-         $sat->fcomienzo = Date( mt_rand(1, 27).'-'.mt_rand(1, 12).'-Y' );
+         $sat->fentrada = $sat->fcomienzo = Date( mt_rand(1, 27).'-'.mt_rand(1, 12).'-Y' );
          $sat->save();
       }
    }
