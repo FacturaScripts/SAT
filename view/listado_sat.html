@@ -1,11 +1,6 @@
 {include="header"}
 
 <script type="text/javascript">
-   function eliminar_estado(id)
-   {
-      if( confirm("¿Realmente desea eliminar el estado "+id+"?") )
-         window.location.href = '{$fsc->url()}&delete_estado='+id;
-   }
    $(document).ready(function () {
       document.f_buscar_sat.query.focus();
       $("#b_nuevo_sat").click(function (event) {
@@ -113,7 +108,9 @@
                   {if="$fsc->sat_setup['sat_col_fechafin']"}
                   <option value="ffin"{if="$fsc->busqueda['orden']=='ffin'"} selected{/if}>Orden: fecha finalización</option>
                   {/if}
+                  {if="$fsc->sat_setup['sat_col_prioridad']"}
                   <option value="prioridad"{if="$fsc->busqueda['orden']=='prioridad'"} selected{/if}>Orden: prioridad</option>
+                  {/if}
                </select>
             </div>
          </div>
@@ -142,7 +139,7 @@
    <table class="table">
       <thead>
          <tr>
-            <th class="text-left">N sat</th>
+            <th class="text-left">Nº sat</th>
             {if="$fsc->sat_setup['sat_col_prioridad']"}<th class="text-left">Prioridad</th>{/if}
             {if="$fsc->sat_setup['sat_col_fecha']"}<th class="text-left">Fecha</th>{/if}
             {if="$fsc->sat_setup['sat_col_fechaini']"}<th class="text-left">Fecha inicio</th>{/if}
@@ -290,7 +287,7 @@
                         <input type="hidden" name="nuevosat" value="TRUE"/>
                         <div class="form-group">
                            Nombre:
-                           <input class="form-control" type="text" name="nombre" autocomplete="off"/>
+                           <input class="form-control" type="text" name="nombre" autocomplete="off" autofocus=""/>
                         </div>
                         <div class="form-group">
                            {#FS_CIFNIF#}:

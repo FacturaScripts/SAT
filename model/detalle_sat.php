@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class detalles_sat extends fs_model
+class detalle_sat extends fs_model
 {
    public $id;
    public $descripcion;
@@ -57,7 +57,7 @@ class detalles_sat extends fs_model
       $data = $this->db->select("SELECT * FROM detalles_sat WHERE id = ".$this->var2str($id).";");
       if($data)
       {
-         return new detalles_sat($data[0]);
+         return new detalle_sat($data[0]);
       }
       else
          return FALSE;
@@ -109,7 +109,7 @@ class detalles_sat extends fs_model
    
    public function delete()
    {
-      return $this->db->exec("DELETE FROM detalles_sat WHERE id = ".$this->var2str($this->nsat).";");
+      return $this->db->exec("DELETE FROM detalles_sat WHERE id = ".$this->var2str($this->id).";");
    }
    
    public function all()
@@ -122,7 +122,7 @@ class detalles_sat extends fs_model
       if($data)
       {
          foreach($data as $d)
-            $detalleslist[] = new detalles_sat($d);
+            $detalleslist[] = new detalle_sat($d);
       }
       
       return $detalleslist;
@@ -138,7 +138,7 @@ class detalles_sat extends fs_model
       if($data)
       {
          foreach($data as $d)
-            $detalleslist[] = new detalles_sat($d);
+            $detalleslist[] = new detalle_sat($d);
       }
       
       return $detalleslist;

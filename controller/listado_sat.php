@@ -21,7 +21,7 @@
 
 require_model('agente.php');
 require_model('cliente.php');
-require_model('detalles_sat.php');
+require_model('detalle_sat.php');
 require_model('estado_sat.php');
 require_model('pais.php');
 require_model('registro_sat.php');
@@ -164,7 +164,7 @@ class listado_sat extends fs_controller
       {
          $this->meter_extensiones();
          
-         if( isset($_GET['ejemplos']) )
+         if( isset($_GET['ejemplos']) AND $this->user->admin )
          {
             $this->ejemplos();
          }
@@ -206,10 +206,14 @@ class listado_sat extends fs_controller
       else
       {
          /// nuevo cliente
-         $cliente = new cliente();
-         $cliente->codcliente = $cliente->get_new_codigo();
+         $cliente = $this->cliente->get_by_cifnif($_POST['cifnif']);
+         if(!$cliente)
+         {
+            $cliente = new cliente();
+            $cliente->codcliente = $cliente->get_new_codigo();
+            $cliente->cifnif = $_POST['cifnif'];
+         }
          $cliente->nombre = $cliente->razonsocial = $_POST['nombre'];
-         $cliente->cifnif = $_POST['cifnif'];
          $cliente->telefono1 = $_POST['telefono1'];
          $cliente->telefono2 = $_POST['telefono2'];
          $cliente->codserie = $this->empresa->codserie;

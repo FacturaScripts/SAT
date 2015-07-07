@@ -53,7 +53,7 @@ class estado_sat extends fs_model
    {
       return "INSERT INTO estados_sat (id,descripcion,activo,color) VALUES".
               " ('1','Nuevo',TRUE,'D9EDF7')".
-              ",('2','Terminado',FALSE,'DFF0D8');";
+              ",('100','Terminado',FALSE,'DFF0D8');";
    }
    
    public function get($id)

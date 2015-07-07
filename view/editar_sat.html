@@ -2,6 +2,13 @@
 
 {if="$fsc->registro"}
 <script type="text/javascript">
+   function eliminar_detalle(id)
+   {
+      if( confirm("¿Realmente desea eliminar detalle?") )
+         window.location.href = '{$fsc->registro->url()}&delete_detalle='+id;
+      
+      return false;
+   }
    $(document).ready(function () {
       $("#b_eliminar").click(function(event) {
          event.preventDefault();
@@ -91,7 +98,7 @@
       <ul class="nav nav-tabs" role="tablist">
          <li{if="$fsc->mostrar=='home'"} class="active"{/if}>
             <a href="{$fsc->url()}&id={$fsc->registro->nsat}&mostrar=home">
-                <span class="glyphicon glyphicon-list-altt" aria-hidden="true"></span>
+                <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
                 <span class="hidden-xs">&nbsp; Datos generales</span>
             </a>
         </li>
@@ -103,7 +110,7 @@
             </a>
         </li>
       </ul>
-            <div class="tab-content">
+      <div class="tab-content">
          <div role="tabpanel" class="tab-pane {if="$fsc->mostrar=='home'"}active{/if}" id="home">
             <div class="container-fluid" style="margin-top: 10px;">
                <div class="row">
@@ -163,7 +170,7 @@
                   {/if}
                   <div class="col-sm-3">
                      <div class="form-group">
-                        Estado:
+                        <a href="index.php?page=opciones_sat#estados" target="_blank">Estado</a>:
                         <select name="estado" class="form-control" style="background-color: #{$fsc->registro->color_estado()};">
                         {loop="fsc->estado->all()"}
                            {if="$value->id == $fsc->registro->estado"}
@@ -226,6 +233,7 @@
                         <th class="text-left">Usuario</th>
                         <th class="text-left">Detalle</th>
                         <th class="text-right">Fecha</th>
+                        <th></th>
                      </tr>
                   </thead>
                   {loop="fsc->listar_sat_detalle()"}
@@ -233,10 +241,17 @@
                      <td>{$value->nick}</td>
                      <td>{$value->descripcion}</td>
                      <td class="text-right">{$value->fecha}</td>
+                     <td>
+                        {if="$fsc->allow_delete"}
+                        <a href="#" onclick="return eliminar_detalle('{$value->id}')">
+                           <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        </a>
+                        {/if}
+                     </td>
                   </tr>
                   {/loop}
                   <tr>
-                     <td colspan="3">
+                     <td colspan="4">
                         <a href='#' class="btn btn-info btn-block btn-sm" data-toggle="modal" data-target="#modal_nuevo_detalle">
                            Nuevo detalle
                         </a>

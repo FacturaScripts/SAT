@@ -368,31 +368,31 @@ class registro_sat extends fs_model
       
       $sql = "SELECT r.nsat,r.prioridad,r.fentrada,r.fcomienzo,r.ffin,r.modelo,
          r.codcliente,c.nombre,c.telefono1,c.telefono2,r.estado,r.averia,r.accesorios,
-         r.observaciones,r.posicion,r.contacto,r.codagente,e.activo FROM registros_sat r, clientes c,estados_sat e
-         WHERE r.codcliente = c.codcliente and r.estado = e.id";
+         r.observaciones,r.posicion,r.contacto,r.codagente
+         FROM registros_sat r, clientes c WHERE r.codcliente = c.codcliente";
       
       if($buscar != '')
       {
          if( is_numeric($buscar) )
          {
-            $sql .= " AND (nsat = ".$this->var2str($buscar)." OR lower(modelo) LIKE '%".$buscar."%'
-               OR r.observaciones LIKE '%".$buscar."%' OR lower(nombre) LIKE '%".$buscar."%')";
+            $sql .= " AND (r.nsat = ".$this->var2str($buscar)." OR lower(r.modelo) LIKE '%".$buscar."%'
+               OR r.observaciones LIKE '%".$buscar."%' OR lower(c.nombre) LIKE '%".$buscar."%')";
          }
          else
          {
-            $sql .= " AND (lower(modelo) LIKE '%".$buscar."%' OR r.observaciones LIKE '%".$buscar."%'
-               OR lower(nombre) LIKE '%".$buscar."%')";
+            $sql .= " AND (lower(r.modelo) LIKE '%".$buscar."%' OR r.observaciones LIKE '%".$buscar."%'
+               OR lower(c.nombre) LIKE '%".$buscar."%')";
          }
       }
       
       if($desde != '')
       {
-         $sql .= " AND fcomienzo >= ".$this->var2str($desde);
+         $sql .= " AND r.fcomienzo >= ".$this->var2str($desde);
       }
       
       if($hasta != '')
       {
-         $sql .= " AND fcomienzo <= ".$this->var2str($hasta);
+         $sql .= " AND r.fcomienzo <= ".$this->var2str($hasta);
       }
       
       if($estado == '')
@@ -401,9 +401,9 @@ class registro_sat extends fs_model
       }
       else if($estado == 'activos')
       {
-         $sql .= " AND e.activo"; 
+         $sql .= " AND r.estado IN (SELECT id as estado FROM estados_sat WHERE activo)"; 
       }
-      elseif($estado != "todos")
+      else if($estado != "todos")
       {
          $sql .= " AND r.estado = ".$this->var2str($estado); 
       }
@@ -443,7 +443,9 @@ class registro_sat extends fs_model
       if($data)
       {
          foreach($data as $d)
+         {
             $satlist[] = new registro_sat($d);
+         }
       }
       
       return $satlist;
@@ -451,12 +453,17 @@ class registro_sat extends fs_model
    
    public function num_detalles()
    {
-      $result = $this->db->select("SELECT count(*) as num FROM detalles_sat WHERE nsat = ".$this->var2str($this->nsat).";");
-      if($result)
+      $num = 0;
+      
+      if( $this->db->table_exists('detalles_sat') )
       {
-         return intval($result[0]['num']);
+         $result = $this->db->select("SELECT count(*) as num FROM detalles_sat WHERE nsat = ".$this->var2str($this->nsat).";");
+         if($result)
+         {
+            $num = intval($result[0]['num']);
+         }
       }
-      else
-         return 0;
+      
+      return $num;
    }
 }

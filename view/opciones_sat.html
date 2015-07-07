@@ -1,5 +1,20 @@
 {include="header"}
 
+<script type="text/javascript" src="plugins/SAT/view/jscolor/jscolor.js"></script>
+<script type="text/javascript">
+   function eliminar_estado(id)
+   {
+      if( confirm("¿Realmente desea eliminar el estado "+id+"?") )
+         window.location.href = '{$fsc->url()}&delete_estado='+id+'#estados';
+   }
+   $(document).ready(function () {
+      if(window.location.hash.substring(1) == 'estados')
+      {
+         $('#tab_opciones a[href="#estados"]').tab('show');
+      }
+   });
+</script>
+
 <br/>
 
 <div class="container">
@@ -18,15 +33,15 @@
    </div>
    <div class="row">
       <div class="col-sm-12">
-         <ul class="nav nav-tabs" role="tablist">
+         <ul id="tab_opciones" class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
                <a href="#general" aria-controls="general" role="tab" data-toggle="tab">
-                  General
+                  <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> &nbsp; General
                </a>
             </li>
             <li role="presentation">
                <a href="#estados" aria-controls="estados" role="tab" data-toggle="tab">
-                  Estados
+                  <span class="glyphicon glyphicon-tag" aria-hidden="true"></span> &nbsp; Estados
                </a>
             </li>
             <li role="presentation">
@@ -122,7 +137,7 @@
                   </tr>
                </thead>
                {loop="$fsc->estado->all()"}
-               <form action="{$fsc->url()}" method="post" class="form">
+               <form action="{$fsc->url()}#estados" method="post" class="form">
                   <input type="hidden" name="id_estado" value="{$value->id}"/>
                   <tr>
                      <td><div class="form-control">{$value->id}</div></td>
@@ -150,7 +165,7 @@
                   </tr>
                </form>
                {/loop}
-               <form action="{$fsc->url()}" method="post" class="form">
+               <form action="{$fsc->url()}#estados" method="post" class="form">
                   <tr class="bg-info">
                      <td><input type="text" name="id_estado" value="{$fsc->estado->get_nuevo_id()}" class="form-control" autocomplete="off"/></td>
                      <td><input type="text" name="descripcion" value="" class="form-control" autocomplete="off"/></td>

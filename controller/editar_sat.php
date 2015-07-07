@@ -20,7 +20,7 @@
 
 require_model('agente.php');
 require_model('cliente.php');
-require_model('detalles_sat.php');
+require_model('detalle_sat.php');
 require_model('estado_sat.php');
 require_model('pais.php');
 require_model('registro_sat.php');
@@ -51,7 +51,6 @@ class editar_sat extends fs_controller
       
       /// ¿El usuario tiene permiso para eliminar en esta página?
       $this->allow_delete = $this->user->allow_delete_on(__CLASS__);
-      
       
       /// cargamos la configuración
       $fsvar = new fs_var();
@@ -134,7 +133,9 @@ class editar_sat extends fs_controller
             if( isset($_POST['ffin']) )
             {
                if ($_POST['ffin'] != '')
+               {
                   $this->registro->ffin = $_POST['ffin'];
+               }
             }
 
             $this->registro->averia = $_POST['averia'];
@@ -178,6 +179,22 @@ class editar_sat extends fs_controller
                $this->new_error_msg('Imposible guardar los datos del SAT.');
             }
          }
+         else if( isset($_GET['delete_detalle']) )
+         {
+            $det0 = new detalle_sat();
+            $detalle = $det0->get($_GET['delete_detalle']);
+            if($detalle)
+            {
+               if( $detalle->delete() )
+               {
+                  $this->new_message('Detalle eliminado correctamente.');
+               }
+               else
+                  $this->new_error_msg('Error al eliminar el detalle.');
+            }
+            else
+               $this->new_error_msg('Detalle no encontrado.');
+         }
       }
    }
 
@@ -211,15 +228,15 @@ class editar_sat extends fs_controller
    
    public function listar_sat_detalle()
    {
-      $detalle = new detalles_sat();
+      $detalle = new detalle_sat();
       return $detalle->all_from_sat($this->registro->nsat);
    }
    
    private function agrega_detalle()
    {
-      $detalle = new detalles_sat();
+      $detalle = new detalle_sat();
       $detalle->descripcion = $_POST['detalle'];
-      $detalle->nsat = $_GET['id'];
+      $detalle->nsat = $this->registro->nsat;
       $detalle->nick = $this->user->nick;
       
       if( $detalle->save() )
@@ -237,9 +254,9 @@ class editar_sat extends fs_controller
       $estado = $this->estado->get($id);
       if($estado)
       {
-         $detalle = new detalles_sat();
+         $detalle = new detalle_sat();
          $detalle->descripcion = "Se a cambiado el estado a: " . $estado->descripcion;
-         $detalle->nsat = $_GET['id'];
+         $detalle->nsat = $this->registro->nsat;
          $detalle->nick = $this->user->nick;
          
          if( $detalle->save() )

@@ -51,7 +51,7 @@
       <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
          <li class="active">
             <a href="#datos" data-toggle="tab">
-               <span class="glyphicon glyphicon-wrench"></span> &nbsp; Datos generales
+               <span class="glyphicon glyphicon-list-alt"></span> &nbsp; Datos generales
             </a>
          </li>
          <li>
@@ -108,7 +108,7 @@
                   {/if}
                   <div class="col-sm-3">
                      <div class="form-group">
-                        Estado:
+                        <a href="index.php?page=opciones_sat#estados" target="_blank">Estado</a>:
                         <select name="estado" class="form-control">
                            {loop="fsc->estado->all()"}
                            <option value="{$value->id}">{$value->descripcion}</option>
@@ -147,7 +147,11 @@
                            <option value="">Ninguno</option>
                            <option value="">------</option>
                            {loop="$fsc->agente->all()"}
-                           <option value="{$value->codagente}">{$value->get_fullname()}</option>
+                              {if="$value->codagente==$fsc->cliente_s->codagente"}
+                              <option value="{$value->codagente}" selected="selected">{$value->get_fullname()}</option>
+                              {else}
+                              <option value="{$value->codagente}">{$value->get_fullname()}</option>
+                              {/if}
                            {/loop}
                         </select>
                      </div>
@@ -159,7 +163,7 @@
             <div style="padding: 10px;">
                <div class="form-group">
                   Observaciones:
-                  <textarea class="form-control" name="observaciones" rows="8"></textarea>
+                  <textarea class="form-control" name="observaciones" rows="8" autofocus=""></textarea>
                </div>
             </div>
          </div>
