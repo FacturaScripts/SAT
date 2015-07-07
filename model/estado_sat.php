@@ -28,6 +28,7 @@ class estado_sat extends fs_model
    public $id;
    public $descripcion;
    public $color;
+   public $activo;
    
    public function __construct($e = FALSE)
    {
@@ -37,18 +38,20 @@ class estado_sat extends fs_model
          $this->id = $this->intval($e['id']);
          $this->descripcion = $e['descripcion'];
          $this->color = $e['color'];
+         $this->activo= $this->str2bool($e['activo']);
       }
       else
       {
          $this->id = NULL;
          $this->descripcion = '';
          $this->color = '000000';
+         $this->activo= TRUE;
       }
    }
    
    protected function install()
    {
-      return "INSERT INTO estados_sat (id,descripcion,color) VALUES ('1','Nuevo','D9EDF7'),('2','Terminado','DFF0D8');";
+      return "INSERT INTO estados_sat (id,descripcion,activo,color) VALUES ('1','Nuevo',TRUE,'D9EDF7'),('2','Terminado',FALSE,'DFF0D8');";
    }
    
    public function get($id)
@@ -91,13 +94,15 @@ class estado_sat extends fs_model
       if( $this->exists() )
       {
          $sql = "UPDATE estados_sat SET descripcion = ".$this->var2str($this->descripcion).
+                 ", activo = ".$this->activo.
                  ", color = ".$this->var2str($this->color)." WHERE id = ".$this->var2str($this->id).";";
       }
       else
       {
-         $sql = "INSERT INTO estados_sat (id,descripcion,color) VALUES ("
+         $sql = "INSERT INTO estados_sat (id,descripcion,activo,color) VALUES ("
                  .$this->var2str($this->id).","
                  .$this->var2str($this->descripcion).","
+                 .$this->activo.","
                  .$this->var2str($this->color).");";
       }
       

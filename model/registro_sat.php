@@ -361,15 +361,15 @@ class registro_sat extends fs_model
       return $satlist;
    }
    
-   public function search($buscar='', $desde='', $hasta='', $estado='', $orden='nsat', $offset=0)
+   public function search($buscar='', $desde='', $hasta='', $estado='activos', $orden='nsat', $offset=0)
    {
       $satlist = array();
       $buscar = strtolower( trim($buscar) );
       
       $sql = "SELECT r.nsat,r.prioridad,r.fentrada,r.fcomienzo,r.ffin,r.modelo,
          r.codcliente,c.nombre,c.telefono1,c.telefono2,r.estado,r.averia,r.accesorios,
-         r.observaciones,r.posicion,r.contacto,r.codagente FROM registros_sat r, clientes c
-         WHERE r.codcliente = c.codcliente";
+         r.observaciones,r.posicion,r.contacto,r.codagente,e.activo FROM registros_sat r, clientes c,estados_sat e
+         WHERE r.codcliente = c.codcliente and r.estado = e.id";
       
       if($buscar != '')
       {
@@ -397,7 +397,15 @@ class registro_sat extends fs_model
       
       if($estado != '')
       {
-         $sql .= " AND r.estado = ".$this->var2str($estado);
+          if($estado=='activos')
+          {
+              $sql .= " AND e.activo = 1"; 
+          }
+          elseif($estado!="todos")
+          {
+             $sql .= " AND r.estado = ".$this->var2str($estado); 
+          }
+         
       }
       
       if($orden == 'prioridad')

@@ -81,16 +81,21 @@ class detalles_sat extends fs_model
       
       if( $this->exists() )
       {
-         $sql = "UPDATE detalles_sat SET descripcion = ".$this->var2str($this->descripcion).",
-            fecha = ".$this->var2str($this->fecha).", nsat = ".$this->var2str($this->nsat).",
-            nick = ".$this->var2str($this->nick)." WHERE id = ".$this->var2str($this->id).";";
+         $sql = "UPDATE detalles_sat SET descripcion = ".$this->var2str($this->descripcion).
+                 ", fecha = ".$this->var2str($this->fecha).
+                 ", nsat = ".$this->var2str($this->nsat).
+                 ", nick = ".$this->var2str($this->nick).
+                 " WHERE id = ".$this->var2str($this->id).";";
          
          return $this->db->exec($sql);
       }
       else
       {
-         $sql = "INSERT INTO detalles_sat (descripcion,fecha,nsat,nick) VALUES (".$this->var2str($this->descripcion).",
-            ".$this->var2str($this->fecha).",".$this->var2str($this->nsat).",".$this->var2str($this->nick).");";
+         $sql = "INSERT INTO detalles_sat (descripcion,fecha,nsat,nick) VALUES (".
+                 $this->var2str($this->descripcion).",".
+                 $this->var2str($this->fecha).",".
+                 $this->var2str($this->nsat).",".
+                 $this->var2str($this->nick).");";
          
          if( $this->db->exec($sql) )
          {
@@ -111,8 +116,8 @@ class detalles_sat extends fs_model
    {
       $detalleslist = array();
       
-      $sql = "SELECT d.id,d.descripcion,d.nsat,d.fecha,d.nick FROM registros_sat r, detalles_sat d
-         WHERE d.nsat = r.nsat ORDER BY d.fecha ASC, d.id ASC;";
+      $sql = "SELECT d.id,d.descripcion,d.nsat,d.fecha,d.nick FROM registros_sat r, detalles_sat d".
+              " WHERE d.nsat = r.nsat ORDER BY d.fecha ASC, d.id ASC;";
       $data = $this->db->select($sql);
       if($data)
       {
@@ -127,8 +132,8 @@ class detalles_sat extends fs_model
    {
       $detalleslist = array();
       
-      $sql = "SELECT d.id,d.descripcion,d.nsat,d.fecha,d.nick FROM registros_sat r, detalles_sat d
-         WHERE d.nsat = r.nsat AND d.nsat = ".$this->var2str($sat)." ORDER BY d.fecha ASC, d.id ASC;";
+      $sql = "SELECT d.id,d.descripcion,d.nsat,d.fecha,d.nick FROM registros_sat r, detalles_sat d".
+              " WHERE d.nsat = r.nsat AND d.nsat = ".$this->var2str($sat)." ORDER BY d.fecha ASC, d.id ASC;";
       $data = $this->db->select($sql);
       if($data)
       {

@@ -11,11 +11,11 @@
    });
 </script>
 
-<form action="{$fsc->registro->url()}" method="post" class="form">
+<form action="{$fsc->registro->url()}&id{$fsc->registro->nsat}" method="post" class="form">
    <div class="container-fluid hidden-print" style="margin-top: 10px;">
       <div class="row">
          <div class="col-xs-8">
-            <a href="{$fsc->registro->url()}" class="btn btn-sm btn-default" title="Recargar la página">
+            <a href="{$fsc->registro->url()&id{$fsc->registro->nsat}}" class="btn btn-sm btn-default" title="Recargar la página">
                <span class="glyphicon glyphicon-refresh"></span>
             </a>
             <div class="btn-group">
@@ -89,22 +89,22 @@
    
    <div class="hidden-print" role="tabpanel">
       <ul class="nav nav-tabs" role="tablist">
-         <li role="presentation" class="active">
-            <a href="#home" aria-controls="home" role="tab" data-toggle="tab">
-               <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
-               <span class="hidden-xs">&nbsp; Datos generales</span>
+         <li{if="$fsc->mostrar=='home'"} class="active"{/if}>
+            <a href="{$fsc->url()}&id={$fsc->registro->nsat}&mostrar=home">
+                <span class="glyphicon glyphicon-list-altt" aria-hidden="true"></span>
+                <span class="hidden-xs">&nbsp; Datos generales</span>
             </a>
-         </li>
-         <li role="presentation">
-            <a href="#detalles" aria-controls="detalles" role="tab" data-toggle="tab">
+        </li>
+        <li{if="$fsc->mostrar=='detalles'"} class="active"{/if}>
+            <a href="{$fsc->url()}&id={$fsc->registro->nsat}&mostrar=detalles" title="Detalles">
                <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
                <span class="hidden-xs">&nbsp; Detalles</span>
                <span class="hidden-sm badge">{$fsc->registro->num_detalles()}</span>
             </a>
-         </li>
+        </li>
       </ul>
-      <div class="tab-content">
-         <div role="tabpanel" class="tab-pane active" id="home">
+            <div class="tab-content">
+         <div role="tabpanel" class="tab-pane {if="$fsc->mostrar=='home'"}active{/if}" id="home">
             <div class="container-fluid" style="margin-top: 10px;">
                <div class="row">
                   {if="$fsc->sat_setup['sat_col_modelo']"}
@@ -218,7 +218,7 @@
                </div>
             </div>
          </div>
-         <div role="tabpanel" class="tab-pane" id="detalles">
+         <div role="tabpanel" class="tab-pane {if="$fsc->mostrar=='detalles'"}active{/if}" id="detalles">
             <div class="table-responsive">
                <table class="table table-hover">
                   <thead>

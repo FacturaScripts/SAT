@@ -33,6 +33,7 @@ require_model('registro_sat.php');
 class editar_sat extends fs_controller
 {
    public $agente;
+   public $mostrar;
    public $allow_delete;
    public $estado;
    public $registro;
@@ -72,7 +73,17 @@ class editar_sat extends fs_controller
          $this->sat_setup['sat_col_fechaini'] = TRUE;
          $this->sat_setup['sat_col_fechafin'] = TRUE;
       }
-      
+      /// ¿Qué pestaña hay que mostrar?
+      $this->mostrar = 'home';
+      if( isset($_REQUEST['mostrar']) )
+      {
+         $this->mostrar = $_REQUEST['mostrar'];
+         setcookie('sat_mostrar', $this->mostrar, time()+FS_COOKIES_EXPIRE);
+      }
+      else if( isset($_COOKIE['sat_mostrar']) )
+      {
+         $this->mostrar = $_COOKIE['sat_mostrar'];
+      } 
       
       $this->registro = FALSE;
       if( isset($_REQUEST['id']) )

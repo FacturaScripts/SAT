@@ -91,8 +91,8 @@
          <div class="col-sm-3">
             <div class="form-group">
                <select name="estado" class="form-control" onchange="this.form.submit();">
-                  <option value=""{if="$fsc->busqueda['estado']=='todos'"} selected{/if}>Todos</option>
-                  <option value="">------</option>
+                  <option value="activos" {if="$fsc->busqueda['estado']=='activos'"} selected{/if}>Activos</option>
+                  <option value="todos"{if="$fsc->busqueda['estado']=='todos'"} selected{/if}>Todos</option>
                   {loop="fsc->estado->all()"}
                   <option value="{$value->id}"{if="$fsc->busqueda['estado']==$value->id"} selected{/if}>{$value->descripcion}</option>
                   {/loop}
@@ -352,6 +352,7 @@
             <th class="text-left">Estado</th>
             <th class="text-left">Descripción</th>
             <th class="text-left">Color</th>
+            <th class="text-left">¿Listado de activos?</th>
             <th class="text-right">Acciones</th>
          </tr>
       </thead>
@@ -366,6 +367,34 @@
             <td>
                <input type="text" name="color" value="{$value->color}" class="form-control color" autocomplete="off" maxlength="6"/>
             </td>
+            {if="$value->activo==0"}
+            <td>
+                <div class="checkbox">
+                    <label>
+                        Si
+                        <input type="radio" name="activo" value=1 >
+                    </label>
+                    <label>
+                        No
+                        <input type="radio" name="activo" value=0 checked>        
+                    </label>
+                </div>
+            </td>
+            {else}
+            <td>
+                <div class="checkbox">
+                    <label>
+                        Si
+                        <input type="radio" name="activo" value=1 checked>
+                    </label>
+                    <label>
+                        No
+                        <input type="radio" name="activo" value=0 >        
+                    </label>
+                </div>
+            </td>
+            {/if}
+            
             <td class="text-right">
                <div class="btn-group">
                   {if="$fsc->allow_delete"}
@@ -391,6 +420,18 @@
             </td>
             <td>
                <input type="text" name="color" value="FFFFFF" class="form-control color" autocomplete="off" maxlength="6"/>
+            </td>
+            <td>
+                <div class="checkbox">
+                    <label>
+                        Si
+                        <input type="radio" name="activo" value=true checked>
+                    </label>
+                    <label>
+                        No
+                        <input type="radio" name="activo" value=false >        
+                    </label>
+                </div>
             </td>
             <td class="text-right">
                <div class="btn-group">

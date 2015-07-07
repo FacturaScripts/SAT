@@ -53,7 +53,7 @@ class listado_sat extends fs_controller
    protected function private_core()
    {
       $this->agente = new agente();
-      $this->busqueda = array('desde' => '', 'hasta' => '', 'estado' => '', 'orden' => 'nsat');
+      $this->busqueda = array('desde' => '', 'hasta' => '', 'estado' => 'activos', 'orden' => 'nsat');
       $this->cliente = new cliente();
       $this->cliente_s = FALSE;
       $this->estado = new estado_sat();
@@ -122,11 +122,11 @@ class listado_sat extends fs_controller
       if( isset($_REQUEST['mostrar']) )
       {
          $this->mostrar = $_REQUEST['mostrar'];
-         setcookie('sat_mostrar', $this->mostrar, time()+FS_COOKIES_EXPIRE);
+         setcookie('editasat_mostrar', $this->mostrar, time()+FS_COOKIES_EXPIRE);
       }
-      else if( isset($_COOKIE['sat_mostrar']) )
+      else if( isset($_COOKIE['editasat_mostrar']) )
       {
-         $this->mostrar = $_COOKIE['sat_mostrar'];
+         $this->mostrar = $_COOKIE['editasat_mostrar'];
       }
       
       
@@ -191,6 +191,7 @@ class listado_sat extends fs_controller
          }
          $estado->descripcion = $_POST['descripcion'];
          $estado->color = $_POST['color'];
+         $estado->activo= $_POST['activo'];
          
          if( $estado->save() )
          {
@@ -229,8 +230,14 @@ class listado_sat extends fs_controller
          {
             $this->ejemplos();
          }
-         
-         $this->resultado = $this->registro_sat->all($this->offset);
+         $this->resultado = $this->registro_sat->search(
+                 $this->query,
+                 $this->busqueda['desde'],
+                 $this->busqueda['hasta'],
+                 $this->busqueda['estado'],
+                 $this->busqueda['orden'],
+                 $this->offset
+         );
       }
    }
    
