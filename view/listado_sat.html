@@ -26,9 +26,9 @@
 
 <form name="f_buscar_sat" action="{$fsc->url()}" method="post" class="form">
    <input type="hidden" name="mostrar" value="{$fsc->mostrar}"/>
-   <div class="container-fluid" style="margin-top: 10px; margin-bottom: 10px;">
+   <div class="container-fluid" style="margin-top: 10px;">
       <div class="row">
-         <div class="col-sm-6">
+         <div class="col-xs-6">
             <div class="btn-group hidden-xs">
                <a class="btn btn-sm btn-default" href="{$fsc->url()}" title="Recargar la página">
                   <span class="glyphicon glyphicon-refresh"></span>
@@ -54,7 +54,7 @@
                {/loop}
             </div>
          </div>
-         <div class="col-sm-6 text-right">
+         <div class="col-xs-6 text-right">
             {if condition="isset($_GET['codcliente'])"}
             <h2 style="margin-top: 0px;">Resultados del cliente {$_GET['codcliente']}</h2>
             {else}
