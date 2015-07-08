@@ -29,6 +29,7 @@ class imprimir_sat extends fs_controller
 {
    public $agente;
    public $registro;
+   public $sat_setup;
    
    public function __construct()
    {
@@ -37,6 +38,27 @@ class imprimir_sat extends fs_controller
    
    protected function private_core()
    {
+      /// cargamos la configuración
+      $fsvar = new fs_var();
+      $this->sat_setup = $fsvar->array_get(
+         array(
+            'sat_col_modelo' => 0,
+            'sat_col_posicion' => 0,
+            'sat_col_accesorios' => 0,
+            'sat_col_prioridad' => 0,
+            'sat_col_fecha' => 1,
+            'sat_col_fechaini' => 0,
+            'sat_col_fechafin' => 0,
+            'sat_condiciones' => "Condiciondes del deposito:\nLos presupuestos realizados tienen una".
+               " validez de 15 dias.\nUna vez avisado al cliente para que recoja el producto este dispondrá".
+               " de un plazo máximo de 2 meses para recogerlo, de no ser así y no haber aviso por parte del".
+               " cliente se empezará a cobrar 1 euro al día por gastos de almacenaje.\nLos accesorios y".
+               " productos externos al equipo no especificados en este documento no podrán ser reclamados en".
+               " caso de disconformidad con el técnico."
+         ),
+         FALSE
+      );
+      
       $this->registro = FALSE;
       if( isset($_REQUEST['id']) )
       {
@@ -62,5 +84,10 @@ class imprimir_sat extends fs_controller
          $prioridad[] = array('id_prioridad' => $i, 'nombre_prioridad' => $value);
 
       return $prioridad;
+   }
+   
+   public function condiciones()
+   {
+      return nl2br($this->sat_setup['sat_condiciones']);
    }
 }

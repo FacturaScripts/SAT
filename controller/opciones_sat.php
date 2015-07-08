@@ -64,7 +64,13 @@ class opciones_sat extends fs_controller
             'sat_col_prioridad' => 0,
             'sat_col_fecha' => 1,
             'sat_col_fechaini' => 0,
-            'sat_col_fechafin' => 0
+            'sat_col_fechafin' => 0,
+            'sat_condiciones' => "Condiciones del deposito:\nLos presupuestos realizados tienen una".
+               " validez de 15 días.\nUna vez avisado al cliente para que recoja el producto este dispondrá".
+               " de un plazo máximo de 2 meses para recogerlo, de no ser así y no haber aviso por parte del".
+               " cliente se empezará a cobrar 1 euro al día por gastos de almacenaje.\nLos accesorios y".
+               " productos externos al equipo no especificados en este documento no podrán ser reclamados en".
+               " caso de disconformidad con el técnico."
          ),
          FALSE
       );
@@ -78,6 +84,7 @@ class opciones_sat extends fs_controller
          $this->sat_setup['sat_col_fecha'] = ( isset($_POST['col_fecha']) ? 1 : 0 );
          $this->sat_setup['sat_col_fechaini'] = ( isset($_POST['col_fechaini']) ? 1 : 0 );
          $this->sat_setup['sat_col_fechafin'] = ( isset($_POST['col_fechafin']) ? 1 : 0 );
+         $this->sat_setup['sat_condiciones'] = $fsvar->no_html($_POST['condiciones']);
          
          if( $fsvar->array_save($this->sat_setup) )
          {

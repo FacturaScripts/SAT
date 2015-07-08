@@ -381,7 +381,7 @@ class registro_sat extends fs_model
          else
          {
             $sql .= " AND (lower(r.modelo) LIKE '%".$buscar."%' OR r.observaciones LIKE '%".$buscar."%'
-               OR lower(c.nombre) LIKE '%".$buscar."%')";
+               OR lower(r.averia) LIKE '%".$buscar."%' OR lower(c.nombre) LIKE '%".$buscar."%')";
          }
       }
       
