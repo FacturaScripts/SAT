@@ -23,6 +23,7 @@ require_model('agente.php');
 require_model('cliente.php');
 require_model('detalle_sat.php');
 require_model('estado_sat.php');
+require_model('fs_relation.php');
 require_model('pais.php');
 require_model('registro_sat.php');
 
@@ -118,7 +119,6 @@ class listado_sat extends fs_controller
       }
       else if( isset($_REQUEST['nuevosat']) )
       {
-         $this->page->title = "Nuevo SAT";
          $this->nuevo_sat();
       }
       else if( isset($_GET['delete']) )
@@ -182,13 +182,17 @@ class listado_sat extends fs_controller
    
    private function nuevo_sat()
    {
+      $this->page->title = "Nuevo SAT";
+      
       if( isset($_GET['codcliente']) )
       {
+         /// cliente ya seleccionado
          $this->cliente_s = $this->cliente->get($_GET['codcliente']);
          $this->template = "agregasat";
          
          if( isset($_POST['averia']) )
          {
+            /// el usuario ha hecho clic en Guardar el registro SAT
             $this->cliente_s->nombre = $_POST['nombre'];
             $this->cliente_s->telefono1 = $_POST['telefono1'];
             $this->cliente_s->telefono2 = $_POST['telefono2'];
@@ -298,10 +302,32 @@ class listado_sat extends fs_controller
             $this->registro_sat->codagente = $_POST['codagente'];
          }
          
-         if ($this->registro_sat->save())
+         if( $this->registro_sat->save() )
          {
             $this->new_message('Datos del SAT guardados correctamente.');
-            header('Location: '.$this->registro_sat->url());
+            
+            $new_url = $this->registro_sat->url();
+            if( isset($_GET['fsrel']) )
+            {
+               /**
+                * Si tenemos un fsrel, es porque ya tenemos la mitad de la relación
+                * de este nuevo registro con algún otro elemento. Así que tenemos que
+                * completar y volver a la url indicada.
+                */
+               $fsrel0 = new fs_relation();
+               $fsrel = $fsrel0->get($_GET['fsrel']);
+               if($fsrel)
+               {
+                  $fsrel->table2 = 'registros_sat';
+                  $fsrel->id2 = $this->registro_sat->nsat;
+                  if( $fsrel->save() )
+                  {
+                     $new_url = $fsrel->return_url;
+                  }
+               }
+            }
+            
+            header('Location: '.$new_url);
          }
          else
          {
@@ -425,5 +451,15 @@ class listado_sat extends fs_controller
       }
       
       return $url;
+   }
+   
+   public function fsrel_url()
+   {
+      if( isset($_GET['fsrel']) )
+      {
+         return '&fsrel='.$_GET['fsrel'];
+      }
+      else
+         return '';
    }
 }

@@ -33,9 +33,9 @@ require_model('registro_sat.php');
 class editar_sat extends fs_controller
 {
    public $agente;
-   public $mostrar;
    public $allow_delete;
    public $estado;
+   public $mostrar;
    public $registro;
    public $sat_setup;
    

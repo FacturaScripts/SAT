@@ -10,7 +10,7 @@
    });
 </script>
 
-<form name="f_nuevo_sat" action="{$fsc->url()}&nuevosat=TRUE&codcliente={$fsc->cliente_s->codcliente}" method="post" class="form">
+<form name="f_nuevo_sat" action="{$fsc->url()}&nuevosat=TRUE&codcliente={$fsc->cliente_s->codcliente}{$fsc->fsrel_url()}" method="post" class="form">
    <div class="container-fluid">
       <div class="row">
          <div class="col-sm-12">

@@ -109,6 +109,13 @@
                <span class="hidden-sm badge">{$fsc->registro->num_detalles()}</span>
             </a>
         </li>
+        {loop="$fsc->extensions"}
+            {if="$value->type=='tab'"}
+            <li role="presentation">
+               <a href="#ext_{$value->name}" aria-controls="ext_{$value->name}" role="tab" data-toggle="tab">{$value->text}</a>
+            </li>
+            {/if}
+         {/loop}
       </ul>
       <div class="tab-content">
          <div role="tabpanel" class="tab-pane {if="$fsc->mostrar=='home'"}active{/if}" id="home">
@@ -253,7 +260,8 @@
                   <tr>
                      <td colspan="4">
                         <a href='#' class="btn btn-info btn-block btn-sm" data-toggle="modal" data-target="#modal_nuevo_detalle">
-                           Nuevo detalle
+                           <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                           &nbsp; Nuevo detalle
                         </a>
                      </td>
                   </tr>
@@ -265,6 +273,13 @@
                <textarea class="form-control" name="observaciones" rows="9">{$fsc->registro->observaciones}</textarea>
             </div>
          </div>
+         {loop="$fsc->extensions"}
+            {if="$value->type=='tab'"}
+            <div role="tabpanel" class="tab-pane" id="ext_{$value->name}">
+               <iframe src="index.php?page={$value->from}{$value->params}&id={$fsc->registro->nsat}" width="100%" height="600" frameborder="0"></iframe>
+            </div>
+            {/if}
+         {/loop}
       </div>
    </div>
 </form>
