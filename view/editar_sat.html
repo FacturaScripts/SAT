@@ -26,7 +26,7 @@
                <span class="glyphicon glyphicon-refresh"></span>
             </a>
             <div class="btn-group">
-               <button type="button" class="btn btn-sm btn-default" onclick="window.print();">
+               <button type="button" class="btn btn-sm btn-default" onclick="$('#frame_print').get(0).contentWindow.print();">
                   <span class="glyphicon glyphicon-print"></span>
                   <span class="hidden-xs">&nbsp; Imprimir</span>
                </button>
@@ -285,7 +285,7 @@
 </form>
 
 <div class="visible-print">
-   <iframe src="index.php?page=imprimir_sat&id={$fsc->registro->nsat}" width="100%" height="950" frameborder="0" scrolling="no"></iframe>
+   <iframe id="frame_print" src="index.php?page=imprimir_sat&id={$fsc->registro->nsat}" width="100%" height="950" frameborder="0" scrolling="no"></iframe>
 </div>
 
 <div class="modal fade" id="modal_nuevo_detalle">
